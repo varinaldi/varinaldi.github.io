@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>SCBD-GBK 3D</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.6/"></script>
+
+  <script>
+    require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/layers/SceneLayer",
+
+      "dojo/domReady!"
+    ], function(
+      WebScene, SceneView, SceneLayer, Legend, LayerList,
+      on, dom
+    ) {
+
+
+      var scene = new WebScene({
+        portalItem: {
+           id: "f22499286717452f9dfeade94cdd4c51"
+        }
+      });
+
+
+      var view = new SceneView({
+        map: scene,
+        container: "viewDiv",
+        environment: {
+          lighting: {
+            ambientOcclusionEnabled: true
+          }
+        }
+      });
+      var renderer = {
+          type: "simple",
+          symbol:{
+            type: "mesh-3d", // autocasts as new MeshSymbol3D()
+            symbolLayers: [{
+              type: "fill"
+            }]
+        },visualVariables: [{
+               type: "color",
+               field: "FloorNumber",
+               stops: [{
+                 value: 1,
+                 color: [178,216,216, 0.9]
+               }, {
+                 value: 20,
+                 color: [0,128,128, 0.9]
+               }]
+             },{
+               value: 40,
+               color: [0,76,76, 0.9]
+             }]
+           }
+
+      var Layer = new SceneLayer({
+        portalItem: {
+          id: "e0999e3c37e74ae1bab68e553ffa8615"
+        },
+        renderer: renderer,
+        popupEnabled: true
+      });
+
+      scene.add(Layer);
+
+    });
+  </script>
+
+
+
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+
+  </style>
+
+</head>
+
+<body>
+  <div id="viewDiv">
+
+  </div>
+</body>
+
+</html>

@@ -37,38 +37,29 @@
           }
         }
       });
-      var renderer = {
-          type: "simple",
-          symbol:{
-            type: "mesh-3d", // autocasts as new MeshSymbol3D()
-            symbolLayers: [{
-              type: "fill"
-            }]
-        },visualVariables: [{
-               type: "color",
-               field: "FloorNumber",
-               stops: [{
-                 value: 1,
-                 color: [178,216,216, 0.9]
-               }, {
-                 value: 20,
-                 color: [0,128,128, 0.9]
-               }]
-             },{
-               value: 40,
-               color: [0,76,76, 0.9]
-             }]
-           }
 
-      var Layer = new SceneLayer({
+
+      var activeLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        },
-        renderer: renderer,
-        popupEnabled: true
+        }
       });
 
-      scene.add(Layer);
+      var backgroundLayer = new SceneLayer({
+        portalItem: {
+          id: "e0999e3c37e74ae1bab68e553ffa8615"
+        }
+      });
+
+
+      activeLayer.visible = true;
+      backgroundLayer.visible = false;
+
+      scene.addMany([activeLayer, backgroundLayer]);
+
+
+      activeLayer.definitionExpression = "";
+      backgroundLayer.definitionExpression = "";
 
     });
   </script>

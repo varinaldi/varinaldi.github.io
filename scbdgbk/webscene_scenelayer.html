@@ -42,13 +42,13 @@
       var activeLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }
+        }, popup: false
       });
 
       var backgroundLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }
+        }, popup: false
       });
 
 
@@ -57,9 +57,28 @@
 
       scene.addMany([activeLayer, backgroundLayer]);
 
+      var highlight;
+      view.on("click", function(event){
+         view.hitTest(event).then(function(response){
+           if (response.results[0]) {
+             var graphic = response.results[0].graphic;
 
-      activeLayer.definitionExpression = "";
-      backgroundLayer.definitionExpression = "";
+             view.whenLayerView(graphic.layer).then(function(lyrView){
+
+               if (highlight) {
+                  highlight.remove();
+                  }
+
+                  highlight = lyrView.highlight(graphic);
+
+
+             })
+
+           }
+         })
+        });
+
+
 
     });
   </script>

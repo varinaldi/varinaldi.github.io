@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>SCBD-GBK 3D</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.6/"></script>
+
+  <script>
+    require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+
+
+      "dojo/domReady!"
+    ], function(
+      WebScene, SceneView, Legend, LayerList
+    ) {
+
+
+      var scene = new WebScene({
+        portalItem: {
+           id: "c1ab3c3955514bea99f89bdd2a8aaa1f"
+        }
+      });
+
+
+      var view = new SceneView({
+        map: scene,
+        container: "viewDiv",
+        environment: {
+          lighting: {
+            ambientOcclusionEnabled: true
+          }
+        }
+      });
+
+      view.popupManager.enabled = false;
+
+    scene.when(function() {
+      // load layer
+       var buildingLayer = scene.layers.find(function(l) {
+            return l.title === "SCBD GBK buildings";
+        });
+
+
+        var floorLayer = scene.layers.find(function(l) {
+           return l.title === "Floor";
+         });
+
+         //var usageLayer = scene.layers.find(function(l) {
+              //return l.title === "Usage";
+          //});
+
+         buildingLayer.visible = true;
+         flooLayer.visible = true;
+         //usageLayer.visible = false;
+
+         var hiddenBuildings = [];
+         // on click
+         view.on("click", function(event) {
+          // use hitTest to find if any graphics were clicked
+            view.hitTest(event)
+              .then(function(response) {
+
+                var graphic = response.results[0].graphic;
+
+                // check if a graphic is returned from the hitTest
+                // and that it belongs to the Buildings layer
+                if (graphic && graphic.layer.title === "SCBD GBK buildings") {
+
+                  // function that hides the building the user clicked on
+                  hideBuilding(graphic.attributes.BID);
+                    buildinglaLayer.visible = false;
+                }
+              });
+          });
+
+        // select function
+        function hideBuilding(id) {
+
+          hiddenBuildings.push(id);
+          // filter out buildings by setting definitionExpression
+          buildingLayer.definitionExpression = "BID NOT IN (" +
+            hiddenBuildings.join(",") + ")";
+
+          flooLayer.definitionExpression = "BID IN (" +
+            hiddenBuildings.join(",") + ")";
+
+        }
+
+
+
+      });
+
+    });
+  </script>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+
+  </style>
+
+</head>
+
+<body>
+  <div id="viewDiv">
+
+  </div>
+</body>
+
+</html>

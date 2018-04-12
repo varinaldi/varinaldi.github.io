@@ -43,63 +43,91 @@
       var activeLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }, popupEnabled: false
+        }, popupEnabled: false,
+           title: "Buildings"
       });
 
       var backgroundLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }, popupEnabled: false
+        }, popupEnabled: false,
+           title: "Buildings"
       });
 
 
       activeLayer.visible = true;
       backgroundLayer.visible = false;
 
+      activeLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
+
+      backgroundLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
+
+      var symbol = {
+         type: "mesh-3d", // autocasts as new MeshSymbol3D()
+         symbolLayers: [{
+           type: "fill", // autocasts as new FillSymbol3DLayer()
+           // If the value of material is not assigned, the default color will be grey
+           material: {
+             color: [244, 247, 134]
+           }
+         }]
+       };
+
       scene.addMany([activeLayer, backgroundLayer]);
 
+      scene.when(function() {
 
-      var highlight;
+       // array that will store the masked buildings
+       var selectedBuildings = [];
 
-      view.whenLayerView(activeLayer).then(function(activeLayerView){
+       // register a click event on the view
+       view.on("click", function(event) {
+         // use hitTest to find if any graphics were clicked
+         view.hitTest(event)
+           .then(function(response) {
 
-          view.on("click", function(event){
+             var result = response.results[0];
 
-           view.hitTest(event).then(function(response){
+             // check if a graphic is returned from the hitTest
+             // and that it belongs to the Buildings layer
+             if (!result.graphic) {
 
-             if (response.results[0].graphic) {
+                activeLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
+                backgroundLayer.visible = false
 
-               var query = new Query({
-                      objectIds: [response.results[0].graphic
-                        .attributes.OBJECTID
-                      ],
-                      outFields: ["BID"]
-                    });
+             } else {
+               if (graphic && graphic.layer.title === "Buildings") {
 
-                activeLayerView.queryFeatures(query).then(function(result) {
-
-                    console.log(result.features);
-                    var expression = "BID == (" + result.features.attributes.BID + ")";
-                    activeLayerView.definitionExpression = expression;
-
-                    if (highlight) {
-                        highlight.remove();
-                          }
-
-                    highlight = activeLayerView.highlight(result.feature);
-
-                      });
-
-
-
+                  selectBuilding(result.graphic.attributes.BID);
                 }
-              })
-            })
+             }
 
-         });
+           });
+       });
 
 
 
+       function selectBuilding(id) {
+         selectedBuildings.push(id);
+         // filter out buildings by setting definitionExpression
+         activeLayer.definitionExpression = "BID IN (" +
+           selectedBuildings.join(",") + ")";
+
+         backgroundLayer.definitionExpression = "BID NOT IN (" +
+            selectedBuildings.join(",") + ")";
+
+         backgroundLayer.visible = true;
+
+         activeLayer.renderer = {
+          type: "simple", // autocasts as new SimpleRenderer()
+          symbol: symbol
+        };
+
+
+       }
+
+
+     });
     });
   </script>
 

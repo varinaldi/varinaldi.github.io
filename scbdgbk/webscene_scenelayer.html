@@ -78,18 +78,19 @@
 
                 activeLayerView.queryFeatures(query).then(function(result) {
 
-                    var expression = "BID IN (" + result.features.attributes.BID + ")";
-                    var selection = activeLayerView.definitionExpression = expression;
+                    console.log(result.features);
+                    var expression = "BID == (" + result.features.attributes.BID + ")";
+                    activeLayerView.definitionExpression = expression;
 
+                    if (highlight) {
+                        highlight.remove();
+                          }
 
+                    highlight = activeLayerView.highlight(result.feature);
 
                       });
 
-                      if (highlight) {
-                          highlight.remove();
-                            }
 
-                      highlight = activeLayerView.highlight(selection);
 
                 }
               })

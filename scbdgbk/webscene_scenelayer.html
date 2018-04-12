@@ -38,17 +38,18 @@
         }
       });
 
+      view.popupManager.enabled = false;
 
       var activeLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }, popup: false
+        }, popupEnabled: false
       });
 
       var backgroundLayer = new SceneLayer({
         portalItem: {
           id: "e0999e3c37e74ae1bab68e553ffa8615"
-        }, popup: false
+        }, popupEnabled: false
       });
 
 
@@ -57,26 +58,44 @@
 
       scene.addMany([activeLayer, backgroundLayer]);
 
+
       var highlight;
-      view.on("click", function(event){
-         view.hitTest(event).then(function(response){
-           if (response.results[0]) {
-             var graphic = response.results[0].graphic;
 
-             view.whenLayerView(graphic.layer).then(function(lyrView){
+      view.whenLayerView(activeLayer).then(function(activeLayerView){
 
-               if (highlight) {
-                  highlight.remove();
-                  }
+          view.on("click", function(event){
 
-                  highlight = lyrView.highlight(graphic);
+           view.hitTest(event).then(function(response){
+
+             if (response.results[0].graphic) {
+
+               var query = new Query({
+                      objectIds: [response.results[0].graphic
+                        .attributes.OBJECTID
+                      ],
+                      outFields: ["BID"]
+                    });
+
+                activeLayerView.queryFeatures(query).then(function(result) {
+
+                    var expression = "BID IN (" + result.features.attributes.BID + ")";
+                    var selection = activeLayerView.definitionExpression = expression;
 
 
-             })
 
-           }
-         })
-        });
+                      });
+
+                      if (highlight) {
+                          highlight.remove();
+                            }
+
+                      highlight = activeLayerView.highlight(selection);
+
+                }
+              })
+            })
+
+         });
 
 
 

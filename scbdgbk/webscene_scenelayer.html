@@ -13,10 +13,12 @@
       "esri/WebScene",
       "esri/views/SceneView",
       "esri/layers/SceneLayer",
+      "esri/tasks/support/Query",
 
-      "dojo/domReady!"
+      "dojo/domReady!",
+      "dojo/on"
     ], function(
-      WebScene, SceneView, SceneLayer, Legend, LayerList,
+      WebScene, SceneView, SceneLayer, Legend, Query, LayerList,
       on, dom
     ) {
 
@@ -58,9 +60,6 @@
       activeLayer.visible = true;
       backgroundLayer.visible = false;
 
-      activeLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
-
-      backgroundLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
 
       var symbol = {
          type: "mesh-3d", // autocasts as new MeshSymbol3D()
@@ -73,61 +72,77 @@
          }]
        };
 
+       var symbolOri = {
+          type: "mesh-3d", // autocasts as new MeshSymbol3D()
+          symbolLayers: [{
+            type: "fill", // autocasts as new FillSymbol3DLayer()
+            // If the value of material is not assigned, the default color will be grey
+            material: {
+              color: [66, 134, 244]
+            }
+          }]
+        };
+
       scene.addMany([activeLayer, backgroundLayer]);
 
       scene.when(function() {
 
-       // array that will store the masked buildings
-       var selectedBuildings = [];
+        view.whenLayerView(activeLayer)
+          .then(function(sceneLayerView) {
 
-       // register a click event on the view
-       view.on("click", function(event) {
-         // use hitTest to find if any graphics were clicked
-         view.hitTest(event)
-           .then(function(response) {
+           // register a click event on the view
+           view.on("click", function(event) {
+             // use hitTest to find if any graphics were clicked
+             view.hitTest(event)
+               .then(function(response) {
 
-             var result = response.results[0];
+                 var result = response.results[0];
 
-             // check if a graphic is returned from the hitTest
-             // and that it belongs to the Buildings layer
-             if (!result.graphic) {
+                     if (!result.graphic) {
 
-                activeLayer.definitionExpression = "BID IN (1, 2, 3, 4)";
-                backgroundLayer.visible = false
+                        backgroundLayer.visible = false
 
-             } else {
-               if (graphic && graphic.layer.title === "Buildings") {
+                        activeLayer.renderer = {
+                         type: "simple", // autocasts as new SimpleRenderer()
+                         symbol: symbolOri
 
-                  selectBuilding(result.graphic.attributes.BID);
-                }
-             }
+                       };
 
-           });
-       });
+                 } else {
+                     if (result.graphic && result.graphic.layer.title === "Buildings") {
+
+                       // get objectid of clicked
+                       objectid = [result.graphic.attribute.OBJECTID];
+
+                       var query = new Query({
+                           objectIds: objectid,
+                           // indicates the query should return all attributes
+                           outFields: ["BID"]
+                         });
+
+                      sceneLayerView.queryFeatures(query)
+                          .then(function(results) {
+
+                          var buildingID = results.features[0].attributes["BID"];
+
+                          sceneLayerViewLayer.renderer = {
+                              type: "simple", // autocasts as new SimpleRenderer()
+                              symbol: symbol };
+                        });
+
+                         } // end of if yo
+                       }
+                });
+              });
+              // end of click event on the view
 
 
-
-       function selectBuilding(id) {
-         selectedBuildings.push(id);
-         // filter out buildings by setting definitionExpression
-         activeLayer.definitionExpression = "BID IN (" +
-           selectedBuildings.join(",") + ")";
-
-         backgroundLayer.definitionExpression = "BID NOT IN (" +
-            selectedBuildings.join(",") + ")";
-
-         backgroundLayer.visible = true;
-
-         activeLayer.renderer = {
-          type: "simple", // autocasts as new SimpleRenderer()
-          symbol: symbol
-        };
-
-
-       }
-
-
+        // end of whenLayerView
+        });
      });
+     // end of scene.when
+
+    // end of script
     });
   </script>
 

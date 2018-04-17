@@ -15,6 +15,7 @@
       "esri/views/SceneView",
       "esri/layers/SceneLayer",
       "esri/widgets/LayerList",
+      "esri/tasks/QueryTask",
 
 
 
@@ -22,7 +23,7 @@
        "dojo/on",
       "dojo/domReady!"
     ], function(
-      WebScene, SceneView, SceneLayer, LayerList, dom, on
+      WebScene, SceneView, SceneLayer, LayerList, dom, on, Query
     ) {
 
 
@@ -52,12 +53,19 @@
       });
 
 
-      //var damagedBuidling = new SceneLayer({
-        //portalItem: {
-          //id: "544d3296d98e408da9eaa931e046f1ee"
-        //}, popupEnabled: false,
-          // title: "Damage Building"
-      //});
+      var damagedBuidling = new SceneLayer({
+        portalItem: {
+          id: "a5aca675d1b4440c8b1487b311d2f420"
+          }, popupEnabled: false,
+           title: "Damage Building"
+      });
+
+      var backBuidling = new SceneLayer({
+        portalItem: {
+          id: "a5aca675d1b4440c8b1487b311d2f420"
+          }, popupEnabled: false,
+           title: "Building"
+      });
 
 
       var damagedLayer = new SceneLayer({
@@ -67,25 +75,39 @@
            title: "Damage"
       });
 
+      damagedBuidling.visible = true;
+      backBuidling.visible = true;
 
-    //  damagedBuidling.renderer = {
-          //type: "simple",  // autocasts as new SimpleRenderer()
-          //symbol: {
-            //type: "mesh-3d",  // autocasts as new MeshSymbol3D()
-            //symbolLayers: [{
-              //type: "fill",  // autocasts as new FillSymbol3DLayer()
-              //material: { color: "red" }
-            //}]
-          //}
-        //};
+      damagedBuidling.listMode = false;
+
+    damagedBuidling.renderer = {
+          type: "simple",  // autocasts as new SimpleRenderer()
+          symbol: {
+            type: "mesh-3d",  // autocasts as new MeshSymbol3D()
+            symbolLayers: [{
+              type: "fill",  // autocasts as new FillSymbol3DLayer()
+              material: { color: [173, 43, 43],
+                          colorMixMode: "replace"}
+            }]
+          }
+        };
 
       floodLayer.opacity = 0.6;
       damagedLayer.opacity = 0.6;
+      damagedBuidling.opacity = 0.7;
 
       damagedLayer.visible = false;
 
+      damagedBuidling.listMode = "hide";
+      backBuidling.listMode = "hide";
 
-      scene.addMany([floodLayer, damagedLayer]);
+      scene.addMany([floodLayer, damagedLayer, damagedBuidling, backBuidling]);
+
+      //--------- add ui stuff --------------
+
+      var query = floodLayer.createQuery();
+
+
 
 
       var slider = document.getElementById("myRange");
@@ -97,15 +119,30 @@
       // wowow
 
       slider.oninput = function() {
-        output.innerHTML = "Hour " + this.value + " of flooding";
+        output.innerHTML = "Hour " + this.value + " of Flooding";
         //range.push(this.value);
         var range = []
         for ( x=1;x<=this.value; x++) {
           range.push(x);
         }
+
         floodLayer.definitionExpression = "OBJECTID in (" + range + ")";
         damagedLayer.definitionExpression = "OBJECTID in (" + range + ")";
-        damagedLayer.definitionExpression = "gridcode in (" + range + ")";
+
+        damagedBuidling.definitionExpression = "gridcode in (" + range + ")";
+        backBuidling.definitionExpression = "gridcode NOT in (" + range + ")";
+
+
+        query.objectIds  = this.value;
+        query.returnGeometry = false;
+        query.outFields = ['*'];
+
+        floodLayer.queryFeatures(query).then(function(result){
+        var selection = result.features;
+              // create chart data from selection
+
+          });
+
       }
 
 
@@ -115,14 +152,32 @@
           });
 
 
+      document.getElementById("clear").addEventListener("click",
+              function() {
+                  range = [];
+
+                  floodLayer.definitionExpression = "";
+                  damagedLayer.definitionExpression = "";
+
+                  damagedBuidling.definitionExpression = "";
+                  backBuidling.definitionExpression = ""
+                });
+
+
+
+
       view.ui.add([
          {
           component: slider,
           position: "bottom-right",
-          index:0
+          index:1
         }, {
           component: output,
           position: "top-right",
+          index:0
+        },{
+          component: "reset",
+          position: "bottom-right",
           index:0
         },{
           component: layerList,
@@ -152,7 +207,7 @@
       color: white;
       font-family: helvetica;
       font-size: 100%;
-      opacity: 0.4;
+      opacity: 0.8;
       padding-bottom: 2px;
     }
 
@@ -168,6 +223,7 @@
       height: 10px;
       border-radius: 5px;
       background: #d3d3d3;
+      margin-bottom: 10px;
       outline: none;
       opacity: 0.4;
       -webkit-transition: .2s;
@@ -197,6 +253,24 @@
       cursor: pointer;
   }
 
+  #clear {
+    background-color: #1e8c99;
+    border: none;
+    color: white;
+    padding: 4px 4px;
+    text-align: center;
+    font-size: 10px;
+    margin:  3px;
+    opacity: 0.8;
+    transition: 0.3s;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+    margin-bottom: 6px;
+    border-radius: 8px;
+  }
+
+  button:hover {opacity: 1}
   </style>
 
 </head>
@@ -211,6 +285,10 @@
   </div>
 
 <div id="infoDiv"></div>
+
+<div id="reset">
+    <button id="clear">Reset Slider</button>
+  </div>
 
 <script>
 </script>

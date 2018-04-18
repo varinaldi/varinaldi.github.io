@@ -15,12 +15,10 @@
       "esri/views/SceneView",
       "esri/layers/SceneLayer",
       "esri/widgets/LayerList",
-      "esri/tasks/QueryTask",
-
-
+      "esri/tasks/support/Query",
 
       "dojo/dom",
-       "dojo/on",
+      "dojo/on",
       "dojo/domReady!"
     ], function(
       WebScene, SceneView, SceneLayer, LayerList, dom, on, Query
@@ -105,25 +103,22 @@
 
       //--------- add ui stuff --------------
 
-      var query = floodLayer.createQuery();
-
-
-
-
       var slider = document.getElementById("myRange");
       var output =  document.getElementById("infoDiv");
+      var buildingCount =  document.getElementById("query");
 
-      output.innerHTML = "Hour of flooding";
+      output.innerHTML = "Hour of Flooding";
+      buildingCount.innerHTML = "Total Damaged Buildings"
 
-      //var range = [];
-      // wowow
 
       slider.oninput = function() {
         output.innerHTML = "Hour " + this.value + " of Flooding";
+        var ids = this.value;
         //range.push(this.value);
         var range = []
         for ( x=1;x<=this.value; x++) {
           range.push(x);
+          //console.log(range);
         }
 
         floodLayer.definitionExpression = "OBJECTID in (" + range + ")";
@@ -132,18 +127,38 @@
         damagedBuidling.definitionExpression = "gridcode in (" + range + ")";
         backBuidling.definitionExpression = "gridcode NOT in (" + range + ")";
 
+        view.whenLayerView(floodLayer).then(function(lyrView){
 
-        query.objectIds  = this.value;
-        query.returnGeometry = false;
-        query.outFields = ['*'];
+          query.objectIds  = range;
 
-        floodLayer.queryFeatures(query).then(function(result){
-        var selection = result.features;
-              // create chart data from selection
+          query.returnGeometry = false;
+          query.outFields = ['*'];
 
-          });
+          lyrView.queryFeatures(query).then(function(result){
+              var selection = [];
+              for(x= 0; x<=result.features.length; x++){
 
+                selection.push(result.features[x].attributes.Join_Count);
+                selection.join(",");
+
+                console.log(selection);
+
+              var total = selection.reduce((a, b) => a + b, 0);
+              console.log(total);
+
+              buildingCount.innerHTML = total + " Damaged Buildings"
+
+              }
+
+              //console.log(featureCount);
+              //selection.push(result.features[0].attributes.count) 
+
+            });
+        });
       }
+
+//-------------------------- Query to count damaged building --------------
+
 
 
 
@@ -160,12 +175,14 @@
                   damagedLayer.definitionExpression = "";
 
                   damagedBuidling.definitionExpression = "";
-                  backBuidling.definitionExpression = ""
+                  backBuidling.definitionExpression = "";
+
+                  buildingCount.innerHTML = "Total Damaged Buildings";
                 });
 
 
 
-
+    //-------------------- positioning UI ----------------------
       view.ui.add([
          {
           component: slider,
@@ -175,6 +192,10 @@
           component: output,
           position: "top-right",
           index:0
+        }, {
+          component: buildingCount,
+          position: "top-right",
+          index:1
         },{
           component: "reset",
           position: "bottom-right",
@@ -190,7 +211,6 @@
 
     });
   </script>
-
 
 
   <style>
@@ -211,6 +231,13 @@
       padding-bottom: 2px;
     }
 
+    #query {
+      color: white;
+      font-family: helvetica;
+      font-size: 100%;
+      opacity: 0.8;
+      padding-bottom: 2px;
+    }
 
     .slidecontainer {
       width: 100%;
@@ -285,10 +312,13 @@
   </div>
 
 <div id="infoDiv"></div>
+<div id="query"></div>
 
 <div id="reset">
     <button id="clear">Reset Slider</button>
   </div>
+
+
 
 <script>
 </script>

@@ -15,6 +15,7 @@
       "esri/layers/SceneLayer",
       "esri/tasks/support/Query",
 
+      "dojo/dom",
       "dojo/domReady!",
       "dojo/on"
     ], function(
@@ -85,23 +86,20 @@
 
       scene.addMany([activeLayer, backgroundLayer]);
 
-      scene.when(function() {
 
-        view.whenLayerView(activeLayer)
-          .then(function(sceneLayerView) {
-
+          var selectedBuildings = [];
            // register a click event on the view
            view.on("click", function(event) {
              // use hitTest to find if any graphics were clicked
              view.hitTest(event)
                .then(function(response) {
 
-                 var result = response.results[0];
+                 var select = response.results[0];
 
-                     if (!result.graphic) {
+                     if (!select.graphic) {
 
                         backgroundLayer.visible = false
-
+                        activeLayer.definitionExpression = "";
                         activeLayer.renderer = {
                          type: "simple", // autocasts as new SimpleRenderer()
                          symbol: symbolOri
@@ -109,38 +107,40 @@
                        };
 
                  } else {
-                     if (result.graphic && result.graphic.layer.title === "Buildings") {
+                     if (select.graphic && select.graphic.layer.title === "Buildings") {
 
-                       // get objectid of clicked
-                       objectid = [result.graphic.attribute.OBJECTID];
+                      console.log(select.graphic.attributes.OBJECTID);
 
-                       var query = new Query({
-                           objectIds: objectid,
-                           // indicates the query should return all attributes
-                           outFields: ["BID"]
-                         });
+                      backgroundLayer.visible = true;
 
-                      sceneLayerView.queryFeatures(query)
-                          .then(function(results) {
+                      selectBuilding(select.graphic.attributes.OBJECTID);
 
-                          var buildingID = results.features[0].attributes["BID"];
-
-                          sceneLayerViewLayer.renderer = {
+                      activeLayer.renderer = {
                               type: "simple", // autocasts as new SimpleRenderer()
                               symbol: symbol };
-                        });
-
-                         } // end of if yo
-                       }
+                      } // end of if yo
+                    }
                 });
               });
               // end of click event on the view
 
+    function selectBuilding(id) {
 
-        // end of whenLayerView
+      var query = new Query();
+      query.objectIds  = id;
+      query.returnGeometry = false;
+      query.outFields = ['*'];
+
+      activeLayer.queryFeatures(query).then(function(result){
+
+      var buildingID = result.features[0].attributes.BID;
+        activeLayer.definitionExpression = "BID in (" + buildingID + ")";
+        backgroundLayer.definitionExpression = "BID NOT in (" + buildingID + ")";
+
         });
-     });
-     // end of scene.when
+
+    }
+
 
     // end of script
     });

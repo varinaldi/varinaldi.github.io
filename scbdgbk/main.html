@@ -1,105 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>SCBD-GBK 3D</title>
-
-  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.6/"></script>
-
-  <script>
-    require([
-      "esri/WebScene",
-      "esri/views/SceneView",
-      "esri/widgets/Legend",
-      "esri/widgets/LayerList",
-
-
-      "dojo/domReady!"
-    ], function(
-      WebScene, SceneView, Legend, LayerList
-    ) {
-
-
-      var scene = new WebScene({
-        portalItem: {
-           id: "c1ab3c3955514bea99f89bdd2a8aaa1f"
-        }
-      });
-
-
-      var view = new SceneView({
-        map: scene,
-        container: "viewDiv",
-        environment: {
-          lighting: {
-            ambientOcclusionEnabled: true
-          }
-        }
-      });
-
-      view.popupManager.enabled = false;
-
-    scene.when(function() {
-      // load layer
-       var buildingLayer = scene.layers.find(function(l) {
-            return l.title === "SCBD GBK buildings";
-        });
-
-
-        var floorLayer = scene.layers.find(function(l) {
-           return l.title === "Floor";
-         });
-
-         //var usageLayer = scene.layers.find(function(l) {
-              //return l.title === "Usage";
-          //});
-
-         buildingLayer.visible = true;
-         flooLayer.visible = true;
-         //usageLayer.visible = false;
-
-         var hiddenBuildings = [];
-         // on click
-         view.on("click", function(event) {
-          // use hitTest to find if any graphics were clicked
-            view.hitTest(event)
-              .then(function(response) {
-
-                var graphic = response.results[0].graphic;
-
-                // check if a graphic is returned from the hitTest
-                // and that it belongs to the Buildings layer
-                if (graphic && graphic.layer.title === "SCBD GBK buildings") {
-
-                  // function that hides the building the user clicked on
-                  hideBuilding(graphic.attributes.BID);
-                    buildinglaLayer.visible = false;
-                }
-              });
-          });
-
-        // select function
-        function hideBuilding(id) {
-
-          hiddenBuildings.push(id);
-          // filter out buildings by setting definitionExpression
-          buildingLayer.definitionExpression = "BID NOT IN (" +
-            hiddenBuildings.join(",") + ")";
-
-          flooLayer.definitionExpression = "BID IN (" +
-            hiddenBuildings.join(",") + ")";
-
-        }
-
-
-
-      });
-
-    });
-  </script>
-
+  <title>on proc</title>
   <style>
     html,
     body,
@@ -110,15 +15,139 @@
       width: 100%;
     }
 
-
   </style>
 
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
+
+
+  <script>
+    require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/tasks/support/Query",
+
+      "dojo/dom",
+      "dojo/domReady!"
+    ], function(WebScene, SceneView, Query, dom) {
+
+      // load web scene from ArcGIS Online
+      var webScene = new WebScene({
+        portalItem: { // autocasts as new PortalItem()
+          id: "f22499286717452f9dfeade94cdd4c51"
+        }
+      });
+
+      // create the scene view
+      var view = new SceneView({
+        container: "viewDiv",
+        map: webScene,
+        environment: {
+          lighting: {
+            ambientOcclusionEnabled: true
+          }
+        }
+      });
+
+      var symbol = {
+         type: "mesh-3d", // autocasts as new MeshSymbol3D()
+         symbolLayers: [{
+           type: "fill", // autocasts as new FillSymbol3DLayer()
+           // If the value of material is not assigned, the default color will be grey
+           material: {
+             color: [2255, 255, 255]
+           }
+         }]
+       };
+
+      var symbolSelected = {
+         type: "mesh-3d", // autocasts as new MeshSymbol3D()
+         symbolLayers: [{
+           type: "fill", // autocasts as new FillSymbol3DLayer()
+           // If the value of material is not assigned, the default color will be grey
+           material: {
+             color: [66, 134, 244]
+           }
+         }]
+       };
+
+      view.popupManager.enabled = false;
+
+      // wait until the webscene finished loading
+      webScene.when(function() {
+
+        // retrieve the scene layer from the webscene - in this case it is the first layer
+        var activeLayer =  webScene.layers.find(function(l) {
+           return l.title === "Active";
+         });
+
+        var backgroundLayer =  webScene.layers.find(function(l) {
+           return l.title === "Background";
+         });
+
+        activeLayer.visible = true;
+        backgroundLayer.visible = false;
+
+        // on click shit
+          view.whenLayerView(activeLayer)
+            .then(function(sceneLayerView) {
+
+              view.on("click", function(event) {
+                view.hitTest(event)
+                  .then(function(response) {
+
+                    if (response.results[0].graphic) {
+
+                      backgroundLayer.visible = true;
+
+                      var query = new Query({
+                        objectIds: [response.results[0].graphic
+                          .attributes.OBJECTID
+                        ],
+                        outFields: ["*"]
+                      });
+
+                      sceneLayerView.queryFeatures(query)
+                        .then(function(result) {
+                          console.log(result.features[0].attributes.BID);
+                          activeLayer.definitionExpression = "BID in (" + result.features[0].attributes.BID +")";
+                          backgroundLayer.definitionExpression = "BID NOT in (" + result.features[0].attributes.BID +")";
+
+                          activeLayer.renderer = {
+                              type: "simple",
+                              symbol: symbolSelected
+                            };
+
+                        });
+
+                    } else {
+
+                      if (!response.results[0].graphic) {
+                        backgroundLayer.visible = false;
+                        activeLayer.definitionExpression = "";
+
+                        activeLayer.renderer = {
+                            type: "simple",
+                            symbol: symbol
+                            };
+
+                        } // end of if nothing is selected
+                      }
+                  });
+              })
+            }); // end of view.on click shit
+      }); // end of webScene
+
+      // function that displays some of the attributes of the feature in an HTML element
+
+
+    });
+  </script>
 </head>
 
 <body>
-  <div id="viewDiv">
-
-  </div>
+  <div id="viewDiv"></div>
 </body>
 
 </html>

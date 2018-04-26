@@ -1,85 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>SCBD-GBK 3D</title>
-
-  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.6/"></script>
-
-  <script>
-    require([
-      "esri/WebScene",
-      "esri/views/SceneView",
-      "esri/widgets/Legend",
-      "esri/widgets/LayerList",
-
-
-      "dojo/domReady!"
-    ], function(
-      WebScene, SceneView, Legend, LayerList
-    ) {
-
-
-      var scene = new WebScene({
-        portalItem: {
-           id: "c1ab3c3955514bea99f89bdd2a8aaa1f"
-        }
-      });
-
-
-      var view = new SceneView({
-        map: scene,
-        container: "viewDiv",
-        environment: {
-          lighting: {
-            ambientOcclusionEnabled: true
-          }
-        }
-      });
-
-      // Layer list
-      view.when(function() {
-          var layerList = new LayerList({
-            view: view
-          });
-
-
-          // Add widget to the top right corner of the view
-          view.ui.add(layerList, "top-right");
-        });
-
-        view.when(function() {
-       // get the first layer in the collection of operational layers in the WebMap
-       // when the resources in the MapView have loaded.
-
-       var usageLayer = scene.layers.find(function(l) {
-          return l.title === "Usage";
-        });
-
-        var floorLayer = scene.layers.find(function(l) {
-           return l.title === "Floor";
-         });
-
-       var legend = new Legend({
-         view: view,
-         layerInfos: [{
-           layer: usageLayer,
-           title: "Usage"
-         }, {
-           layer: floorLayer,
-           title: "Floor"
-         }]
-       });
-
-       // Add widget to the bottom right corner of the view
-       view.ui.add(legend, "bottom-right");
-     });
-
-    });
-  </script>
-
+  <title>SCBD-GBK CTHROUGH FINALLY</title>
   <style>
     html,
     body,
@@ -90,15 +15,193 @@
       width: 100%;
     }
 
+    #infoDiv {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+    }
 
+    h3 {
+      border-bottom: 1px solid black;
+    }
+
+    img {
+      max-height: 200px;
+      max-width: 200px;
+    }
   </style>
 
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
+
+
+  <script>
+    require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/tasks/support/Query",
+
+      "dojo/dom",
+      "dojo/domReady!"
+    ], function(WebScene, SceneView, Query, dom) {
+
+      // load web scene from ArcGIS Online
+      var webScene = new WebScene({
+        portalItem: { // autocasts as new PortalItem()
+          id: "f22499286717452f9dfeade94cdd4c51"
+        }
+      });
+
+      // create the scene view
+      var view = new SceneView({
+        container: "viewDiv",
+        map: webScene,
+        environment: {
+          lighting: {
+            ambientOcclusionEnabled: true
+          }
+        }
+      });
+
+      view.popupManager.enabled = false;
+
+// ---------------------- define color for building ---------------------
+      var symbol = {
+         type: "mesh-3d",
+         symbolLayers: [{
+           type: "fill",
+           material: {
+             color: [255, 255, 255]
+           }
+         }]
+       };
+
+      var symbolSelected = {
+         type: "mesh-3d",
+         symbolLayers: [{
+           type: "fill",
+           material: {
+             color: [66, 134, 244]
+           }
+         }]
+       };
+
+
+// ---------------------- interaction ---------------------
+
+      // wait until the webscene finished loading
+      webScene.when(function() {
+
+      // Define layers
+      var backgroundLayer =  webScene.layers.find(function(l) {
+         return l.title === "Background";
+       });
+
+        var activeLayer =  webScene.layers.find(function(l) {
+           return l.title === "Active";
+         });
+
+
+
+        activeLayer.visible = true;
+        backgroundLayer.visible = false;
+
+        // when view is active layer
+        view.whenLayerView(activeLayer)
+          .then(function(sceneLayerView) {
+
+        // on click shit
+              view.on("click", function(event) {
+                view.hitTest(event)
+                  .then(function(response) {
+
+
+
+                    if (response.results[0].graphic)  {
+
+                      console.log(response.results[0].graphic.attributes.OBJECTID);
+
+                      querying(response.results[0].graphic.attributes.OBJECTID, sceneLayerView, function(buildingID, selected){
+
+                          filtering(buildingID, activeLayer, backgroundLayer, selected);
+                          console.log(selected);
+                        });
+
+                        //visualizing(backgroundLayer,sceneLayerView, );
+
+                    } else {
+                        if (!response.results[0].graphic)  {
+
+                            backgroundLayer.visible = true;
+                            activeLayer.renderer = null;
+
+                            activeLayer.definitionExpression = null;
+
+
+                        }
+
+
+                      }
+                  });
+              })
+        // end of on click
+            });
+      }); // end of webScene
+
+      // ---------------------- function -----------------------
+
+
+      function querying(attributes, lyrView, callback) {
+
+            var query = new Query({
+              objectIds: [attributes],
+              outFields: ["*"]
+            });
+
+            lyrView.queryExtent(query)
+                      .then(function(result) {
+                        view.goTo({
+                          target: result.extent.expand(2),
+                          tilt: 60
+                        }, {
+                          duration: 1000,
+                          easing: "out-expo"
+                        });
+                      });
+
+
+            lyrView.queryFeatures(query)
+              .then(function(result) {
+                var buildingID = result.features[0].attributes.BID;
+
+                var selected = result.features;
+                callback(buildingID, selected);
+
+              });
+            }
+
+      function filtering(bid, active, background, selected){
+
+        active.definitionExpression = "BID IN (" + bid  +")";
+        background.definitionExpression = "BID NOT = IN (" + bid  +")";
+
+        background.visible = true;
+
+        active.renderer = {
+            type: "simple",
+            symbol: symbolSelected
+            };
+
+      }
+
+
+
+    });
+  </script>
 </head>
 
 <body>
-  <div id="viewDiv">
-
-  </div>
+  <div id="viewDiv"></div>
 </body>
 
 </html>

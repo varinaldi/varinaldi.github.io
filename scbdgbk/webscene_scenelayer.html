@@ -5,8 +5,8 @@
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>SCBD-GBK 3D</title>
 
-  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.6/"></script>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
 
   <script>
     require([
@@ -19,8 +19,7 @@
       "dojo/domReady!",
       "dojo/on"
     ], function(
-      WebScene, SceneView, SceneLayer, Legend, Query, LayerList,
-      on, dom
+      WebScene, SceneView, SceneLayer, dom, on, Query
     ) {
 
 
@@ -68,12 +67,12 @@
            type: "fill", // autocasts as new FillSymbol3DLayer()
            // If the value of material is not assigned, the default color will be grey
            material: {
-             color: [244, 247, 134]
+             color: [2255, 255, 255]
            }
          }]
        };
 
-       var symbolOri = {
+       var symbolSelected = {
           type: "mesh-3d", // autocasts as new MeshSymbol3D()
           symbolLayers: [{
             type: "fill", // autocasts as new FillSymbol3DLayer()
@@ -86,60 +85,63 @@
 
       scene.addMany([activeLayer, backgroundLayer]);
 
+//---------------------------- interactivity ----------------------------------------------
 
-          var selectedBuildings = [];
-           // register a click event on the view
-           view.on("click", function(event) {
-             // use hitTest to find if any graphics were clicked
-             view.hitTest(event)
-               .then(function(response) {
+    scene.when(function() {
+      view.whenLayerView(activeLayer)
+       .then(function(sceneLayerView) {
+         // on click shit happens
+          view.on("click", function(event) {
+              view.hitTest(event)
+                  .then(function(response) {
 
-                 var select = response.results[0];
+                    var select = response.results[0];
 
-                     if (!select.graphic) {
+                    if (select.graphic && select.graphic.layer.title === "Buildings") {
 
-                        backgroundLayer.visible = false
-                        activeLayer.definitionExpression = "";
-                        activeLayer.renderer = {
-                         type: "simple", // autocasts as new SimpleRenderer()
-                         symbol: symbolOri
+                      var objectids = select.graphic.attributes.OBJECTID;
+                      console.log(objectids);
 
-                       };
+                      query.objectIds  = [objectids];
 
-                 } else {
-                     if (select.graphic && select.graphic.layer.title === "Buildings") {
+                      query.returnGeometry = false;
+                      query.outFields = ['*'];
 
-                      console.log(select.graphic.attributes.OBJECTID);
+                       sceneLayerView.queryExtent(query)
+                         .then(function(result) {
+                           view.goTo({
+                             target: result.extent.expand(2),
+                             tilt: 60
+                           }, {
+                             duration: 1000,
+                             easing: "out-expo"
+                           });
+                         });
 
-                      backgroundLayer.visible = true;
+                       backgroundLayer.visible = true;
 
-                      selectBuilding(select.graphic.attributes.OBJECTID);
 
-                      activeLayer.renderer = {
-                              type: "simple", // autocasts as new SimpleRenderer()
-                              symbol: symbol };
-                      } // end of if yo
-                    }
+
+                     activeLayer.renderer = {
+                        type: "simple",
+                        symbol: symbolSelected
+                        };
+            // ------------if no building features are clicked ---------------
+                      } else {
+                        if (!select.graphic) {
+
+                          backgroundLayer.visible = false
+                          activeLayer.definitionExpression = "";
+                          activeLayer.renderer = {
+                              type: "simple",
+                              symbol: symbol
+                              };
+                          } // end of if nothing is selected
+                        }
                 });
-              });
-              // end of click event on the view
-
-    function selectBuilding(id) {
-
-      var query = new Query();
-      query.objectIds  = id;
-      query.returnGeometry = false;
-      query.outFields = ['*'];
-
-      activeLayer.queryFeatures(query).then(function(result){
-
-      var buildingID = result.features[0].attributes.BID;
-        activeLayer.definitionExpression = "BID in (" + buildingID + ")";
-        backgroundLayer.definitionExpression = "BID NOT in (" + buildingID + ")";
-
+            });
         });
-
-    }
+        });
 
 
     // end of script

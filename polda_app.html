@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Polda App</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/renderers/smartMapping/statistics/uniqueValues",
+        "dojo/domReady!"
+      ],
+      function(
+        Map, MapView,
+        FeatureLayer,
+        uniqueValues
+      ) {
+
+        var map = new Map({
+          basemap: "dark-gray"
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: map,
+
+          center: [ 106.8428588,-6.2498348],
+          zoom:10
+        });
+
+        view.popup = true;
+        /********************
+         * Add feature layer
+         ********************/
+         var renderer = {
+           type: "simple", // autocasts as new SimpleRenderer()
+           symbol: {
+             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+             size: 3,
+             color: "#fff6dd",
+             outline: { // autocasts as new SimpleLineSymbol()
+               color: [255, 196, 17, 0.4], // autocasts as new Color()
+               width: 4             }
+           }
+         };
+
+        var rekapLayer = new FeatureLayer({
+          url: "https://demo.esriindonesia.co.id/arcgis/rest/services/Rekap_Kasus_2016_2017/FeatureServer/0",
+          renderer: renderer,
+
+        });
+
+        map.add(rekapLayer);
+
+        //--------- interactivity
+
+        view.whenLayerView(rekapLayer).then(function(lyrView) {
+          lyrView.watch("updating", function(val) {
+            if (!val) { // wait for the layer view to finish updating
+
+              // query all the features available for drawing.
+              lyrView.queryFeatures({
+                geometry: view.extent,
+                returnGeometry: true
+              }).then(function(results) {
+
+                results
+
+              });
+            }
+          });
+
+        });
+
+        uniqueValues({
+            layer: rekapLayer,
+            field: "SUBKATEGOR"
+          }).then(function(response){
+            // prints each unique value and the count of features containing that value
+            var infos = response.uniqueValueInfos;
+            infos.forEach(function(info){
+              console.log("SUBKATEGORI: ", info.value, " TOTAL: ", info.count);
+            });
+          });
+
+
+      });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+
+</html>

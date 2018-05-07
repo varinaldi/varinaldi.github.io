@@ -30,7 +30,7 @@
     ) {
 
 
-      var webmap = new WebMap({
+      var map = new WebMap({
         portalItem: {
           id: "16d4190a44a24525aa1d75ee83fd3945"
         }
@@ -38,9 +38,28 @@
 
 
       var view = new MapView({
-        map: webmap,
+        map: map,
         container: "viewDiv"
       });
+
+      function findLayerByTitle(title) {
+        return view.map.allLayers.find(function(layer) {
+          return layer.title === title;
+        });
+      }
+
+      // When the view loads, set up UI elements
+      let rekapLayer;
+
+      view.when(function() {
+        rekapLayer = findLayerByTitle(
+          "Rekap kasus 2016 2017");
+        rekapLayer.outFields = ["*"];
+      });
+
+      
+
+
     });
   </script>
 </head>

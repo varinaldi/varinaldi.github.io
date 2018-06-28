@@ -1,0 +1,85 @@
+var symbol = {
+   type: "mesh-3d", // autocasts as new MeshSymbol3D()
+   symbolLayers: [{
+     type: "fill", // autocasts as new FillSymbol3DLayer()
+     // If the value of material is not assigned, the default color will be grey
+     material: {
+       color: [2255, 255, 255]
+     }
+   }]
+ };
+
+var symbolSelected = {
+   type: "mesh-3d", // autocasts as new MeshSymbol3D()
+   symbolLayers: [{
+     type: "fill", // autocasts as new FillSymbol3DLayer()
+     // If the value of material is not assigned, the default color will be grey
+     material: {
+       color: [66, 134, 244]
+     }
+   }]
+ };
+
+webScene.when(function() {
+
+  // retrieve the scene layer from the webscene - in this case it is the first layer
+  var activeLayer =  webScene.layers.find(function(l) {
+     return l.title === "Active";
+   });
+
+  var backgroundLayer =  webScene.layers.find(function(l) {
+     return l.title === "Background";
+   });
+
+  activeLayer.visible = true;
+  backgroundLayer.visible = false;
+
+  // on click shit
+    view.whenLayerView(activeLayer)
+      .then(function(sceneLayerView) {
+
+        view.on("click", function(event) {
+          view.hitTest(event)
+            .then(function(response) {
+
+              if (response.results[0].graphic) {
+
+                backgroundLayer.visible = true;
+
+                var query = new Query({
+                  objectIds: [response.results[0].graphic
+                    .attributes.OBJECTID
+                  ],
+                  outFields: ["*"]
+                });
+
+                sceneLayerView.queryFeatures(query)
+                  .then(function(result) {
+                    console.log(result.features[0].attributes.OBJECTID);
+                    activeLayer.definitionExpression = "OBJECTID in (" + result.features[0].attributes.OBJECTID +")";
+                    backgroundLayer.definitionExpression = "OBJECTID NOT in (" + result.features[0].attributes.OBJECTID +")";
+
+                    activeLayer.renderer = {
+                        type: "simple",
+                        symbol: symbolSelected
+                      };
+
+                  });
+
+              } else {
+
+                if (!response.results[0].graphic) {
+                  backgroundLayer.visible = false;
+                  activeLayer.definitionExpression = "";
+
+                  activeLayer.renderer = {
+                      type: "simple",
+                      symbol: symbol
+                      };
+
+                  } // end of if nothing is selected
+                }
+            });
+        })
+      }); // end of view.on click shit
+}); // end of webScene

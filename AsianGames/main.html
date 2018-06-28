@@ -15,6 +15,11 @@
       width: 100%;
     }
 
+    #infoDiv {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+    }
+
   </style>
 
 
@@ -27,6 +32,8 @@
       "esri/WebScene",
       "esri/views/SceneView",
       "esri/tasks/support/Query",
+      "esri/layers/FeatureLayer",
+
 
       "dojo/dom",
       "dojo/domReady!"
@@ -51,26 +58,30 @@
       });
 
 
-      view.popupManager.enabled = true;
+      view.popupManager.enabled = false;
 
       // wait until the webscene finished loading
       webScene.when(function() {
 
-        // retrieve the scene layer from the webscene - in this case it is the first layer
-        var activeLayer =  webScene.layers.find(function(l) {
+        // retrieve the scene layer from the webscene
+        var venues =  webScene.layers.find(function(l) {
            return l.title === "3DVenues";
          });
 
+         var sports =  webScene.layers.find(function(l) {
+            return l.title === "Sports";
+          });
 
         // on click shit
-          view.whenLayerView(activeLayer)
+          view.whenLayerView(venues)
             .then(function(sceneLayerView) {
 
               view.on("click", function(event) {
                 view.hitTest(event)
                   .then(function(response) {
 
-                    if (response.results[0].graphic) {
+                    // if 3D building is clicked
+                    if (response.results[0].graphic.layer.title === "3DVenues") {
 
                     console.log(response.results[0].graphic
                           .attributes.OBJECTID);
@@ -86,7 +97,7 @@
                       sceneLayerView.queryExtent(query)
                         .then(function(result) {
                           view.goTo({
-                            target: result.extent.expand(2),
+                            target: result.extent.expand(1),
                             tilt: 70,
                             zoom:18
                           }, {
@@ -95,14 +106,42 @@
                           });
                         });
 
+                      sceneLayerView.queryFeatures(query)
+                        .then(function(result) {
+
+                          // log for venue name
+                          console.log(result.features[0].attributes.Name);
+                          // log for GBK website
+                          console.log(result.features[0].attributes.Link);
+
+                          });
+
+                      // if sport point is clicked
+                    } if (response.results[0].graphic.layer.title === "Sports") {
+
+                      var FeatureQuery = new Query({
+                        objectIds: [response.results[0].graphic
+                          .attributes.OBJECTID
+                        ],
+                        outFields: ["TechBook"]
+                      });
+
+                      // log link for technical handbook
+                      console.log(response.results[0].graphic
+                        .attributes.TechBook);
+
+                      // log link to logo
+                        console.log(response.results[0].graphic
+                          .attributes.URL);
+
 
                     }
+
+
                   });
               })
-            }); // end of view.on click shit
+            }); // end of view.on click
       }); // end of webScene
-
-      // function that displays some of the attributes of the feature in an HTML element
 
 
     });

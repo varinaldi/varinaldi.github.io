@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>on proc</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #infoDiv {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+    }
+
+  </style>
+
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
+
+
+  <script>
+    require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/tasks/support/Query",
+      "esri/layers/FeatureLayer",
+
+
+      "dojo/dom",
+      "dojo/domReady!"
+    ], function(WebScene, SceneView, Query, dom) {
+
+      // load web scene from ArcGIS Online
+      var webScene = new WebScene({
+        portalItem: { // autocasts as new PortalItem()
+          id: "d7adce2634974cdd9078ba990123736d"
+        }
+      });
+
+      // create the scene view
+      var view = new SceneView({
+        container: "viewDiv",
+        map: webScene,
+        environment: {
+          lighting: {
+            ambientOcclusionEnabled: true
+          }
+        }
+      });
+
+
+      view.popupManager.enabled = false;
+
+      // wait until the webscene finished loading
+      webScene.when(function() {
+
+        // retrieve the scene layer from the webscene
+        var venues =  webScene.layers.find(function(l) {
+           return l.title === "3DVenues";
+         });
+
+         var sports =  webScene.layers.find(function(l) {
+            return l.title === "Sports";
+          });
+
+        // on click shit
+          view.whenLayerView(venues)
+            .then(function(sceneLayerView) {
+
+              view.on("click", function(event) {
+                view.hitTest(event)
+                  .then(function(response) {
+
+                    // if 3D building is clicked
+                    if (response.results[0].graphic.layer.title === "3DVenues") {
+
+                    console.log(response.results[0].graphic
+                          .attributes.OBJECTID);
+
+                      var query = new Query({
+                        objectIds: [response.results[0].graphic
+                          .attributes.OBJECTID
+                        ],
+                        outFields: ["*"]
+                      });
+
+
+                      sceneLayerView.queryExtent(query)
+                        .then(function(result) {
+                          view.goTo({
+                            target: result.extent.expand(1),
+                            tilt: 70,
+                            zoom:18
+                          }, {
+                            duration: 1000,
+                            easing: "out-expo"
+                          });
+                        });
+
+                      sceneLayerView.queryFeatures(query)
+                        .then(function(result) {
+
+                          // log for venue name
+                          console.log(result.features[0].attributes.Name);
+                          // log for GBK website
+                          console.log(result.features[0].attributes.Link);
+
+                          });
+
+                      // if sport point is clicked
+                    } if (response.results[0].graphic.layer.title === "Sports") {
+
+                      var FeatureQuery = new Query({
+                        objectIds: [response.results[0].graphic
+                          .attributes.OBJECTID
+                        ],
+                        outFields: ["TechBook"]
+                      });
+
+                      // log link for technical handbook
+                      console.log(response.results[0].graphic
+                        .attributes.TechBook);
+
+                      // log link to logo
+                        console.log(response.results[0].graphic
+                          .attributes.URL);
+
+
+                    }
+
+
+                  });
+              })
+            }); // end of view.on click
+      }); // end of webScene
+
+
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+
+</html>

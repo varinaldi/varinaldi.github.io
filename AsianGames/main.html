@@ -54,11 +54,20 @@
           lighting: {
             ambientOcclusionEnabled: true
           }
+        },
+        popup: {
+          actions: [],
+          dockEnabled: true,
+          dockOptions: {
+            buttonEnabled: true,
+            breakpoint: false
+          }
         }
       });
 
 
-      view.popupManager.enabled = false;
+      //view.popupManager.enabled = false;
+      //var output =  document.getElementById("infoDiv");
 
       // wait until the webscene finished loading
       webScene.when(function() {
@@ -108,12 +117,21 @@
 
                       sceneLayerView.queryFeatures(query)
                         .then(function(result) {
-
+z
                           // log for venue name
                           console.log(result.features[0].attributes.Name);
                           // log for GBK website
                           console.log(result.features[0].attributes.Link);
 
+                          view.popup.open({
+                                title: result.features[0].attributes.Name ,  // title displayed in the popup
+                                content:  "<iframe src=" + result.features[0].attributes.Link  +"
+                ></iframe>",  // content displayed in the popup
+                                updateLocationEnabled: true  // updates the location of popup based on
+                                // selected feature's geometry
+                              });
+
+                          //output.innerHTML = "<iframe src=" + result.features[0].attributes.Link  +"</iframe>";
                           });
 
                       // if sport point is clicked
@@ -131,9 +149,8 @@
                         .attributes.TechBook);
 
                       // log link to logo
-                        console.log(response.results[0].graphic
+                      console.log(response.results[0].graphic
                           .attributes.URL);
-
 
                     }
 
@@ -144,12 +161,14 @@
       }); // end of webScene
 
 
+
     });
   </script>
 </head>
 
 <body>
   <div id="viewDiv"></div>
+  <div id="infoDiv">Click on a building to zoom to it and get more information</div>
 </body>
 
 </html>

@@ -33,11 +33,12 @@
       "esri/views/SceneView",
       "esri/tasks/support/Query",
       "esri/layers/FeatureLayer",
+      "esri/symbols/PointSymbol3D",
 
 
       "dojo/dom",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, Query, dom) {
+    ], function(WebScene, SceneView, Query, dom, PointSymbol3D) {
 
       // load web scene from ArcGIS Online
       var webScene = new WebScene({
@@ -65,9 +66,96 @@
         }
       });
 
+      var verticalOffset = {
+        screenLength: 40,
+        maxWorldLength: 200,
+        minWorldLength: 35
+      };
 
+      function getUniqueValueSymbol(name) {
+              return {
+                type: "point-3d", // autocasts as new PointSymbol3D()
+                symbolLayers: [{
+                  type: "icon", // autocasts as new IconSymbol3DLayer()
+                  resource: {
+                    href: name
+                  },
+                  size: 20,
+                  outline: {
+                    color: "white",
+                    size: 2
+                  }
+                }],
+
+                verticalOffset: verticalOffset,
+
+                callout: {
+                  type: "line", // autocasts as new LineCallout3D()
+                  color: "white",
+                  size: 2,
+                  border: {
+                    color: [16, 57, 124]
+                  }
+                }
+              };
+            }
+
+      var pointsRenderer = {
+              type: "unique-value", // autocasts as new UniqueValueRenderer()
+              field: "cabor",
+              uniqueValueInfos: [{
+                value: "Football",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/0bceb0ae2a934d3d8974b815e02277cf/data")
+              }, {
+                value: "Athletics",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/4469ae32c6cf42918607ceb161a311fc/data")
+              }, {
+                value: "Basketball 5x5",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/9ac7d458c7ec466a87d019ee52b1c826/data")
+              }, {
+                value: "Badminton",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/039375e674e64382953bb2348d2e9dda/data")
+              }, {
+                value: "Swimming",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/5d8982b29ab248dab43d6552c0792ba4/data")
+              }, {
+                value: "Synchronized Swimming",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/f31e8d702a8a4569baa161d4727f4e5c/data")
+              }, {
+                value: "Diving",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/3c477db2657e4207beb671f0a4702fe8/data")
+              },, {
+                value: "Water Polo",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/65d8681d8c00473582d99023199a031d/data")
+              }, {
+                value: "Archery",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/11fd01c44f4e4d2788d74156202a0bdc/data")
+              }, {
+                value: "Hockey",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/e17b6dd8ba094dd59148788fe276719e/data")
+              }, {
+                value: "Volleyball",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/664595faf52f4ec2a88e01d91e1f60ef/data")
+              }, {
+                value: "Basketball 3x3",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/610dde8b427644549d40050b1e50d3d3/data")
+              }, {
+                value: "Baseball",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/d406fd59eb9f4bb887f876b7636ea3f3/data")
+              }, {
+                value: "Softball",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/93f311bc2c2d42b1b8715997a274eb0c/data")
+              }, {
+                value: "Rugby 7x7",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/637676df151441779c1313e40314d1f8/data")
+              }, {
+                value: "Squash",
+                symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/a3707204ad724f4cb5fa972589df7b56/data")
+              }]
+            };
       //view.popupManager.enabled = false;
       //var output =  document.getElementById("infoDiv");
+
 
       // wait until the webscene finished loading
       webScene.when(function() {
@@ -81,7 +169,15 @@
             return l.title === "Sports";
           });
 
-        // on click shit
+
+
+          sports.elevationInfo = {
+            mode: "relative-to-scene"
+          };
+
+          sports.renderer = pointsRenderer;
+
+        // on click
           view.whenLayerView(venues)
             .then(function(sceneLayerView) {
 
@@ -117,22 +213,13 @@
 
                       sceneLayerView.queryFeatures(query)
                         .then(function(result) {
-z
+
                           // log for venue name
                           console.log(result.features[0].attributes.Name);
                           // log for GBK website
                           console.log(result.features[0].attributes.Link);
 
-                          view.popup.open({
-                                title: result.features[0].attributes.Name ,  // title displayed in the popup
-                                content:  "<iframe src=" + result.features[0].attributes.Link  +"
-                ></iframe>",  // content displayed in the popup
-                                updateLocationEnabled: true  // updates the location of popup based on
-                                // selected feature's geometry
-                              });
-
-                          //output.innerHTML = "<iframe src=" + result.features[0].attributes.Link  +"</iframe>";
-                          });
+                            });
 
                       // if sport point is clicked
                     } if (response.results[0].graphic.layer.title === "Sports") {

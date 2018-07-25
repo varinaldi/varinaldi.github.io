@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>on proc</title>
+  <title>GBKBMKG</title>
   <style>
     html,
     body,
@@ -19,12 +19,16 @@
       background-color: rgba(255, 255, 255, 0.9);
       padding: 10px;
     }
+    img {
+      max-height: 450px;
+      max-width: 450px;
+    }
 
   </style>
 
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.7/"></script>
+  <script src="https://js.arcgis.com/4.8/"></script>
 
 
   <script>
@@ -34,11 +38,12 @@
       "esri/tasks/support/Query",
       "esri/layers/FeatureLayer",
       "esri/symbols/PointSymbol3D",
+      "esri/PopupTemplate",
 
-
+      "esri/config",
       "dojo/dom",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, Query, dom, PointSymbol3D) {
+    ], function(WebScene, SceneView, Query, dom, PointSymbol3D, esriConfig, PopupTemplate) {
 
       // load web scene from ArcGIS Online
       var webScene = new WebScene({
@@ -55,19 +60,16 @@
           lighting: {
             ambientOcclusionEnabled: true
           }
-        },
-        popup: {
-          actions: [],
-          dockEnabled: true,
-          dockOptions: {
-            buttonEnabled: true,
-            breakpoint: false
-          }
         }
       });
 
+
+      view.popupManager.enabled = false;
+      var output =  document.getElementById("infoDiv");
+
+      // ----------- Scene set up done, now the other stuff ------------
       var verticalOffset = {
-        screenLength: 40,
+        screenLength: 60,
         maxWorldLength: 200,
         minWorldLength: 35
       };
@@ -80,7 +82,7 @@
                   resource: {
                     href: name
                   },
-                  size: 20,
+                  size: 25,
                   outline: {
                     color: "white",
                     size: 2
@@ -91,18 +93,15 @@
 
                 callout: {
                   type: "line", // autocasts as new LineCallout3D()
-                  color: "white",
-                  size: 2,
-                  border: {
-                    color: [16, 57, 124]
-                  }
+                  color: [30,40,85],
+                  size: 2.5
                 }
               };
             }
 
       var pointsRenderer = {
               type: "unique-value", // autocasts as new UniqueValueRenderer()
-              field: "cabor",
+              field: "Cabor",
               uniqueValueInfos: [{
                 value: "Football",
                 symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/0bceb0ae2a934d3d8974b815e02277cf/data")
@@ -153,10 +152,25 @@
                 symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/a3707204ad724f4cb5fa972589df7b56/data")
               }]
             };
-      //view.popupManager.enabled = false;
-      //var output =  document.getElementById("infoDiv");
 
-
+      var venueRenderer = {
+            type: "simple",
+              symbol: {
+                type: "mesh-3d" ,
+                symbolLayers: [{
+                  type: "fill",
+                  material: {
+                    color: "#ffffff",
+                    colorMixMode: "replace"
+                  },
+                  edges: {
+                    type: 'solid',
+                    color: [102, 102, 102],
+                    size: 0.5
+                  }
+                }]
+              }
+            };
       // wait until the webscene finished loading
       webScene.when(function() {
 
@@ -165,17 +179,18 @@
            return l.title === "3DVenues";
          });
 
-         var sports =  webScene.layers.find(function(l) {
-            return l.title === "Sports";
-          });
-
-
+        var sports =  webScene.layers.find(function(l) {
+           return l.title === "Sports";
+         });
 
           sports.elevationInfo = {
             mode: "relative-to-scene"
           };
 
+          venues.renderer = venueRenderer;
           sports.renderer = pointsRenderer;
+
+          sports.popupTemplate = {content: "<img src='{Schedule}' alt=''>"};
 
         // on click
           view.whenLayerView(venues)
@@ -237,25 +252,39 @@
 
                       // log link to logo
                       console.log(response.results[0].graphic
-                          .attributes.URL);
+                          .attributes.Schedule);
 
-                    }
+                      output.innerHTML = "<img src='" + response.results[0].graphic.attributes.Schedule + "' alt=''>";
 
+                    }else {
 
+                      if (!response.results[0].graphic) {
+
+                          output.innerHTML = "Click on logo to get more information";
+
+                        } // end of if nothing is selected
+                      }
                   });
               })
             }); // end of view.on click
       }); // end of webScene
 
 
+      view.ui.add([
+          {
+            component: output,
+            position: "top-right",
+            index:1
+              }
+          ]);
 
     });
   </script>
 </head>
 
 <body>
+  <div id="infoDiv">Click on logo to get more information</div>
   <div id="viewDiv"></div>
-  <div id="infoDiv">Click on a building to zoom to it and get more information</div>
 </body>
 
 </html>

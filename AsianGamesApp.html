@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>on proc</title>
+  <title>Asian Games GBK</title>
   <style>
     html,
     body,
@@ -14,11 +14,17 @@
       height: 100%;
       width: 100%;
     }
+    p {
+    padding: 0px 0px 0px 35px;
+    line-height: 2;
+    }
 
 
 
   </style>
 
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.8.css">
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.8.css">
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
   <script src="https://js.arcgis.com/4.8/"></script>
@@ -38,14 +44,16 @@
       "dojo/domReady!"
     ], function(WebScene, SceneView, Query, dom,PointSymbol3D, esriConfig, PopupTemplate) {
 
-      // load web scene from ArcGIS Online
+//-------------------------------------- loading agol stuff -------------------------------------------
+
+    // load web scene from ArcGIS Online
       var webScene = new WebScene({
         portalItem: { // autocasts as new PortalItem()
           id: "d7adce2634974cdd9078ba990123736d"
         }
       });
 
-      // create the scene view
+    // create the scene view
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
@@ -67,9 +75,19 @@
 
 
       view.popupManager.enabled = true;
-  // -------------------- Scene set up done, now the other stuff --------------------------
 
-          // set up point style for Cabang Olahraga
+      view.popup.dockOptions = {
+        // Disable the dock button so users cannot undock the popup
+        buttonEnabled: false,
+        // Dock the popup when the size of the view is less than or equal to 600x1000 pixels
+        breakpoint: {
+          width: 600,
+          height: 1000
+        }
+      };
+// -------------------- Scene set up done, now the other stuff --------------------------
+
+    // set up point style for Cabang Olahraga
             var verticalOffset = {
               screenLength: 60,
               maxWorldLength: 200,
@@ -155,7 +173,7 @@
                     }]
                   };
 
-          // set up renderer for venue
+    // set up renderer for venue
             var venueRenderer = {
                   type: "simple",
                     symbol: {
@@ -175,7 +193,9 @@
                     }
                   };
 
-      // wait until the webscene finished loading
+// ------------------- interacting with webscene -------------------------------
+
+   // wait until the webscene finished loading
       webScene.when(function() {
 
         // retrieve the scene layer from the webscene
@@ -192,11 +212,14 @@
 
           venues.renderer = venueRenderer;
           sports.renderer = pointsRenderer;
-
+//"<img src='{Schedule}' alt='' width=50% height=50%>"
       // set popup for Cabang Olahraga
-          sports.popupTemplate = {content: "<img src='{Schedule}' alt=''>"};
+          sports.popupTemplate = {
+            title: "<img src='{URL}' alt=''width=24 height=24>" + "<font size=6> {Cabor} </font>",
+            content: "<p><font size=2.5> Venue: {Venue} <br> Capacity: <br> Phase: {Phase}  <br><br><img src='{Schedule}' alt=''width=85% height=85%> <br> <a href= '{TechBook}' target='_blank'>View Technical Handbook </a> </font></p>" };
 
-        // on click shit
+// adding interaction when clicked
+        // on click
           view.whenLayerView(venues)
             .then(function(sceneLayerView) {
 
@@ -204,7 +227,7 @@
                 view.hitTest(event)
                   .then(function(response) {
 
-                    // if 3D building is clicked
+        // if 3D venue is clicked
                     if (response.results[0].graphic.layer.title === "3DVenues") {
 
                     console.log(response.results[0].graphic
@@ -217,7 +240,7 @@
                         outFields: ["*"]
                       });
 
-
+       // query for 3D venue
                       sceneLayerView.queryExtent(query)
                         .then(function(result) {
                           view.goTo({
@@ -240,7 +263,7 @@
 
                           });
 
-                      // if sport point is clicked
+     // if sport point is clicked instead
                     } if (response.results[0].graphic.layer.title === "Sports") {
 
                       var FeatureQuery = new Query({
@@ -257,15 +280,13 @@
                       // log link to logo
                         console.log(response.results[0].graphic
                           .attributes.URL);
-
-
                     }
 
 
                   });
-              })
-            }); // end of view.on click
-      }); // end of webScene
+              })      // end of view.on click
+            });     // end of when venue layer is shown
+      });         // end of webScene
 
 
     });

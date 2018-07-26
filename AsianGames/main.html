@@ -39,38 +39,26 @@
       "esri/layers/FeatureLayer",
       "esri/symbols/PointSymbol3D",
       "esri/PopupTemplate",
+      "esri/views/ui/UI",
 
       "esri/config",
       "dojo/dom",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, Query, dom, PointSymbol3D, esriConfig, PopupTemplate) {
+    ], function(WebScene, SceneView, Query, dom, PointSymbol3D, esriConfig, PopupTemplate, DefaultUI) {
 
-      // load web scene from ArcGIS Online
+//-------------------------------------- loading agol stuff -------------------------------------------
+    // load web scene from ArcGIS Online
       var webScene = new WebScene({
         portalItem: { // autocasts as new PortalItem()
           id: "d7adce2634974cdd9078ba990123736d"
         }
       });
 
-      // extent
-      var jakartaExtent = { // autocasts as new Extent()
-        xmin: 1.1871646144371567E7,
-        ymin: -711126.9069556041,
-        xmax: 1.191148186642383E7,
-        ymax: -677749.6906182922,
-         spatialReference: { // autocasts as new SpatialReference()
-           wkid: 3857
-         }
-       };
 
-      // create the scene view
+    // create the scene view
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
-        viewingMode: "local",
-        // Use the exent defined in clippingArea to define the bounds of the scene
-        clippingArea: jakartaExtent,
-        extent: jakartaExtent,
         camera: {
             position: [
               106.813026,
@@ -89,9 +77,11 @@
 
 
       //view.popupManager.enabled = false;
-      //var output =  document.getElementById("infoDiv");
 
-      // ----------- Scene set up done, now the other stuff ------------
+
+// -------------------- Scene set up done, now the other stuff --------------------------
+
+    // set up point style for Cabang Olahraga
       var verticalOffset = {
         screenLength: 60,
         maxWorldLength: 200,
@@ -177,6 +167,7 @@
               }]
             };
 
+    // set up renderer for venue
       var venueRenderer = {
             type: "simple",
               symbol: {
@@ -195,10 +186,12 @@
                 }]
               }
             };
-      // wait until the webscene finished loading
+
+
+    // wait until the webscene finished loading
       webScene.when(function() {
 
-        // retrieve the scene layer from the webscene
+    // retrieve the scene layer from the webscene
         var venues =  webScene.layers.find(function(l) {
            return l.title === "3DVenues";
          });
@@ -214,9 +207,10 @@
           venues.renderer = venueRenderer;
           sports.renderer = pointsRenderer;
 
+      // set popup for Cabang Olahraga
           sports.popupTemplate = {content: "<img src='{Schedule}' alt=''>"};
 
-        // on click
+      // on click
           view.whenLayerView(venues)
             .then(function(sceneLayerView) {
 
@@ -224,7 +218,7 @@
                 view.hitTest(event)
                   .then(function(response) {
 
-                    // if 3D building is clicked
+      // if 3D building is clicked
                     if (response.results[0].graphic.layer.title === "3DVenues") {
 
                     console.log(response.results[0].graphic
@@ -237,7 +231,7 @@
                         outFields: ["*"]
                       });
 
-
+      // zoom to 3D Venue
                       sceneLayerView.queryExtent(query)
                         .then(function(result) {
                           view.goTo({
@@ -250,6 +244,7 @@
                           });
                         });
 
+      // query for 3D Venue (might delete)
                       sceneLayerView.queryFeatures(query)
                         .then(function(result) {
 
@@ -257,10 +252,9 @@
                           console.log(result.features[0].attributes.Name);
                           // log for GBK website
                           console.log(result.features[0].attributes.Link);
-
                             });
 
-                      // if sport point is clicked
+      // if Cabor point is clicked
                     } if (response.results[0].graphic.layer.title === "Sports") {
 
                       var FeatureQuery = new Query({
@@ -278,36 +272,19 @@
                       console.log(response.results[0].graphic
                           .attributes.Schedule);
 
-                      output.innerHTML = "<img src='" + response.results[0].graphic.attributes.Schedule + "' alt=''>";
-
-                    }else {
-
-                      if (!response.results[0].graphic) {
-
-                          //output.innerHTML = "Click on logo to get more information";
-
-                        } // end of if nothing is selected
-                      }
+                    }
                   });
               })
             }); // end of view.on click
       }); // end of webScene
 
 
-      //view.ui.add([
-          //{
-            //component: output,
-            //position: "top-right",
-            //index:1
-              //}
-          //]);
 
     });
   </script>
 </head>
 
 <body>
-
   <div id="viewDiv"></div>
 </body>
 

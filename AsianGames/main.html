@@ -52,10 +52,34 @@
         }
       });
 
+      // extent
+      var jakartaExtent = { // autocasts as new Extent()
+        xmin: 1.1871646144371567E7,
+        ymin: -711126.9069556041,
+        xmax: 1.191148186642383E7,
+        ymax: -677749.6906182922,
+         spatialReference: { // autocasts as new SpatialReference()
+           wkid: 3857
+         }
+       };
+
       // create the scene view
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
+        viewingMode: "local",
+        // Use the exent defined in clippingArea to define the bounds of the scene
+        clippingArea: jakartaExtent,
+        extent: jakartaExtent,
+        camera: {
+            position: [
+              106.813026,
+              -6.234265,
+              1000  // elevation in meters
+            ],
+            tilt: 65,
+            heading: 330
+          },
         environment: {
           lighting: {
             ambientOcclusionEnabled: true
@@ -64,8 +88,8 @@
       });
 
 
-      view.popupManager.enabled = false;
-      var output =  document.getElementById("infoDiv");
+      //view.popupManager.enabled = false;
+      //var output =  document.getElementById("infoDiv");
 
       // ----------- Scene set up done, now the other stuff ------------
       var verticalOffset = {
@@ -260,7 +284,7 @@
 
                       if (!response.results[0].graphic) {
 
-                          output.innerHTML = "Click on logo to get more information";
+                          //output.innerHTML = "Click on logo to get more information";
 
                         } // end of if nothing is selected
                       }
@@ -270,20 +294,20 @@
       }); // end of webScene
 
 
-      view.ui.add([
-          {
-            component: output,
-            position: "top-right",
-            index:1
-              }
-          ]);
+      //view.ui.add([
+          //{
+            //component: output,
+            //position: "top-right",
+            //index:1
+              //}
+          //]);
 
     });
   </script>
 </head>
 
 <body>
-  <div id="infoDiv">Click on logo to get more information</div>
+
   <div id="viewDiv"></div>
 </body>
 

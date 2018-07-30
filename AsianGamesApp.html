@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
   <title>Asian Games GBK</title>
   <style>
     html,
@@ -13,36 +14,75 @@
       margin: 0;
       height: 100%;
       width: 100%;
+      z-index: -1;
     }
+
     p {
     padding: 0px 0px 0px 35px;
     line-height: 2;
     }
 
+    #navDiv {
+      position: absolute;
+      bottom: 100px;
+      left: 50px;
+      width: 120px;
+      height: 120px;
+      border: 1px solid white;
+      z-index: 1;
+    }
+    #tempDiv {
+      position: absolute;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.4px;
+      bottom: 150px;
+      left: 195px;
+      z-index: 1;
+    }
+    #titleDiv {
+      position: absolute;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.4px;
+      top: 40px;
+      left: 350px;
+      z-index: 1;
+      font-size: 150%;
+      border-left: 1px solid black;
+      padding: 10px;
+    }
+
+    #logo {
+      position: absolute;
+      top:15px;
+      left: 35px;
+      z-index: 1;
+    }
 
 
   </style>
 
-  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.8.css">
-  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.8.css">
 
-  <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.8/"></script>
+  <link href="https://fonts.googleapis.com/css?family=Lato:300" rel="stylesheet">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.7/"></script>
 
 
   <script>
     require([
       "esri/WebScene",
       "esri/views/SceneView",
+      "esri/views/MapView",
+      "esri/WebMap",
+
       "esri/tasks/support/Query",
       "esri/layers/FeatureLayer",
       "esri/symbols/PointSymbol3D",
       "esri/PopupTemplate",
-      "esri/config",
 
       "dojo/dom",
+      "dojo/on",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, Query, dom,PointSymbol3D, esriConfig, PopupTemplate) {
+    ], function(WebScene, SceneView, MapView, WebMap, Query, dom,PointSymbol3D, on, PopupTemplate, FeatureLayer) {
 
 //-------------------------------------- loading agol stuff -------------------------------------------
 
@@ -57,21 +97,20 @@
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
-        camera: {
-            position: [
-              106.813026,
-              -6.234265,
-              1000  // elevation in meters
-            ],
-            tilt: 65,
-            heading: 330
-          },
+        
+        padding: {
+          top: 120,
+          bottom: 0,
+          right: 25,
+          left: 25
+        },
         environment: {
           lighting: {
             ambientOcclusionEnabled: true
           }
         }
       });
+
 
 
       view.popupManager.enabled = true;
@@ -88,90 +127,7 @@
 // -------------------- Scene set up done, now the other stuff --------------------------
 
     // set up point style for Cabang Olahraga
-            var verticalOffset = {
-              screenLength: 60,
-              maxWorldLength: 200,
-              minWorldLength: 35
-            };
 
-            function getUniqueValueSymbol(name) {
-                    return {
-                      type: "point-3d", // autocasts as new PointSymbol3D()
-                      symbolLayers: [{
-                        type: "icon", // autocasts as new IconSymbol3DLayer()
-                        resource: {
-                          href: name
-                        },
-                        size: 25,
-                        outline: {
-                          color: "white",
-                          size: 2
-                        }
-                      }],
-
-                      verticalOffset: verticalOffset,
-
-                      callout: {
-                        type: "line", // autocasts as new LineCallout3D()
-                        color: [30,40,85],
-                        size: 2.5
-                      }
-                    };
-                  }
-
-            var pointsRenderer = {
-                    type: "unique-value", // autocasts as new UniqueValueRenderer()
-                    field: "Cabor",
-                    uniqueValueInfos: [{
-                      value: "Football",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/0bceb0ae2a934d3d8974b815e02277cf/data")
-                    }, {
-                      value: "Athletics",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/4469ae32c6cf42918607ceb161a311fc/data")
-                    }, {
-                      value: "Basketball 5x5",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/9ac7d458c7ec466a87d019ee52b1c826/data")
-                    }, {
-                      value: "Badminton",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/039375e674e64382953bb2348d2e9dda/data")
-                    }, {
-                      value: "Swimming",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/5d8982b29ab248dab43d6552c0792ba4/data")
-                    }, {
-                      value: "Synchronized Swimming",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/f31e8d702a8a4569baa161d4727f4e5c/data")
-                    }, {
-                      value: "Diving",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/3c477db2657e4207beb671f0a4702fe8/data")
-                    },, {
-                      value: "Water Polo",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/65d8681d8c00473582d99023199a031d/data")
-                    }, {
-                      value: "Archery",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/11fd01c44f4e4d2788d74156202a0bdc/data")
-                    }, {
-                      value: "Hockey",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/e17b6dd8ba094dd59148788fe276719e/data")
-                    }, {
-                      value: "Volleyball",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/664595faf52f4ec2a88e01d91e1f60ef/data")
-                    }, {
-                      value: "Basketball 3x3",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/610dde8b427644549d40050b1e50d3d3/data")
-                    }, {
-                      value: "Baseball",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/d406fd59eb9f4bb887f876b7636ea3f3/data")
-                    }, {
-                      value: "Softball",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/93f311bc2c2d42b1b8715997a274eb0c/data")
-                    }, {
-                      value: "Rugby 7x7",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/637676df151441779c1313e40314d1f8/data")
-                    }, {
-                      value: "Squash",
-                      symbol: getUniqueValueSymbol("http://smartcommunity.maps.arcgis.com/sharing/rest/content/items/a3707204ad724f4cb5fa972589df7b56/data")
-                    }]
-                  };
 
     // set up renderer for venue
             var venueRenderer = {
@@ -211,8 +167,8 @@
           };
 
           venues.renderer = venueRenderer;
-          sports.renderer = pointsRenderer;
-//"<img src='{Schedule}' alt='' width=50% height=50%>"
+          //sports.renderer = pointsRenderer;
+
       // set popup for Cabang Olahraga
           sports.popupTemplate = {
             title: "<img src='{URL}' alt=''width=24 height=24>" + "<font size=6> {Cabor} </font>",
@@ -266,12 +222,7 @@
      // if sport point is clicked instead
                     } if (response.results[0].graphic.layer.title === "Sports") {
 
-                      var FeatureQuery = new Query({
-                        objectIds: [response.results[0].graphic
-                          .attributes.OBJECTID
-                        ],
-                        outFields: ["TechBook"]
-                      });
+
 
                       // log link for technical handbook
                       console.log(response.results[0].graphic
@@ -289,12 +240,96 @@
       });         // end of webScene
 
 
+
     });
   </script>
+
+  <script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/WebMap",
+        "esri/layers/FeatureLayer",
+        "dojo/domReady!"
+
+      ],
+      function(
+        Map, MapView,
+        WebMap,
+        FeatureLayer
+      ) {
+
+        var navmap = new WebMap({
+        portalItem: { // autocasts as new PortalItem()
+          id: "8c195fcec6634b25b2302dcda07995f3"
+        }
+      });
+
+        var navview = new MapView({
+          container: "navDiv",
+          map: navmap,
+
+          //center: [ 106.8428588,-6.2498348],
+          //zoom:10
+        });
+
+        navview.popup = true;
+
+
+         var renderer = {
+           type: "simple", // autocasts as new SimpleRenderer()
+           symbol: {
+             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+             size: 3,
+             color: "#fff6dd",
+             outline: { // autocasts as new SimpleLineSymbol()
+               color: [255, 196, 17, 0.4], // autocasts as new Color()
+               width: 4             }
+           }
+         };
+
+        var weather = new FeatureLayer({
+          url: "http://13.76.3.201/asian_games_realtime/FeatureServer/0",
+          renderer: renderer,
+          definitionExpression: "kota = 'Jakarta Pusat'",
+          mode: FeatureLayer.MODE_ONDEMAND,
+          refreshInterval: 0.3, //Set the interval to 1 minute
+
+        });
+
+        weather.outFields = ["*"];
+        navmap.add(weather);
+        navview.ui.components = [];
+
+        //--------- interactivity
+
+
+
+        navview.whenLayerView(weather).then(function(layerView){
+            layerView.watch("updating", function(val){
+              if(!val){  // wait for the layer view to finish updating
+                layerView.queryFeatures().then(function(results){
+                  console.log(results[0].attributes);  // prints all the client-side graphics to the console
+
+                  var temparature =  document.getElementById("tempDiv");
+                  temparature.innerHTML = "<font size= 8>" + results[0].attributes.tt_air_avg + " °C</font> <br>" + "<font size= 3>Max: " + results[0].attributes.tt_air_max + " °C " + "|  Min: " + results[0].attributes.tt_air_min + " °C"  ;
+                });
+              }
+            });
+          });
+
+
+      });
+  </script>
+
 </head>
 
 <body>
   <div id="viewDiv"></div>
-</body>
+  <div id="navDiv"></div>
+  <div id="tempDiv"></div>
+  <div id="titleDiv"> <h> Gelora Bung Karno Sport Complex Guide </h></div>
+  <div id="logo"><img src='https://en.asiangames2018.id/d3images/ml/ag2018-assets/logo--desktop.svg' alt=''width=160% height=150%></div>
+
 
 </html>

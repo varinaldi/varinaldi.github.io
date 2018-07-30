@@ -4,12 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
   <title>Asian Games GBK</title>
   <style>
     html,
     body,
     #viewDiv {
       padding: 0;
+
       margin: 0;
       height: 100%;
       width: 100%;
@@ -18,13 +20,124 @@
     padding: 0px 0px 0px 35px;
     line-height: 2;
     }
-
+    .calcite-navbar{
+      height: 150%;
+    }
 
 
   </style>
 
+  <!-- Calcite Maps Bootstrap -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.8.css">
 
+  <!-- Calcite Maps -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.8.css">
   <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
+
+
+</head>
+
+<body class="calcite-maps calcite-layout-large-title">
+  <!-- Navbar -->
+
+  <nav class="navbar calcite-navbar navbar-fixed-top calcite-text-dark calcite-bg-transparent">
+    <!-- Menu -->
+    <div class="dropdown calcite-dropdown calcite-text-dark calcite-bg-light" role="presentation">
+      <a class="dropdown-toggle" role="menubutton" aria-haspopup="true" aria-expanded="false" tabindex="0">
+        <div class="calcite-dropdown-toggle">
+          <span class="sr-only">Toggle dropdown menu</span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a role="menuitem" tabindex="0" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
+        <li><a role="menuitem" tabindex="0" href="#" data-target="#panelLegend" aria-haspopup="true"><span class="glyphicon glyphicon-list-alt"></span> Legend</a></li>
+        <li><a role="menuitem" tabindex="0" href="#" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
+      </ul>
+    </div>
+    <!-- Title -->
+    <div class="calcite-title calcite-overflow-hidden">
+      <span class="calcite-title-main"><img src='https://en.asiangames2018.id/d3images/ml/ag2018-assets/logo--desktop.svg' alt=''width=100% height=100%></span>
+      <span class="calcite-title-divider hidden-xs"></span>
+      <span class="calcite-title-sub hidden-xs"><font=4>Gelora Bung Karno Sport Complex Guide</font></span>
+    </div>
+    <!-- Nav -->
+    <ul class="nav navbar-nav calcite-nav">
+      <li>
+        <div class="calcite-navbar-search calcite-search-expander">
+          <div id="searchWidgetDiv"></div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!--/.calcite-navbar -->
+
+  <!-- Map  -->
+
+  <div class="calcite-map calcite-map-absolute">
+    <div id="viewDiv"></div>
+  </div>
+
+  <!-- /.calcite-map -->
+
+  <!-- Panels -->
+
+  <div class="calcite-panels calcite-panels-right calcite-text-dark calcite-bg-light panel-group w-75">
+
+    <!-- Panel - Basemaps -->
+
+    <div id="panelInfo" class="panel panel-default collapse">
+      <div id="headingInfo" class="panel-heading" role="tab">
+        <div class="panel-title">
+          <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseInfo"  aria-expanded="true" aria-controls="collapseInfo"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span><span class="panel-label">About</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" tabindex="0" href="#panelInfo"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+        </div>
+      </div>
+      <div id="collapseInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingInfo">
+        <div class="panel-body">
+          <p>This is my map app!</p>
+        </div>
+     </div>
+    </div>
+
+    <!-- Panel - Legend -->
+
+    <div id="panelLegend" class="panel collapse">
+      <div id="headingLegend" class="panel-heading" role="tab">
+        <div class="panel-title">
+          <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseLegend" aria-expanded="false" aria-controls="collapseLegend"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><span class="panel-label">Legend</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" tabindex="0" href="#panelLegend"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+        </div>
+      </div>
+      <div id="collapseLegend" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingLegend">
+        <div class="panel-body">
+          <div id="legendDiv"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- /.calcite-panels -->
+
+  <script type="text/javascript">
+    var dojoConfig = {
+      packages: [{
+        name: "bootstrap",
+        location: "https://esri.github.io/calcite-maps/dist/vendor/dojo-bootstrap"
+      },
+      {
+        name: "calcite-maps",
+        location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+      }]
+    };
+  </script>
+
+  <!-- ArcGIS JS 4 -->
   <script src="https://js.arcgis.com/4.8/"></script>
 
 
@@ -38,9 +151,18 @@
       "esri/PopupTemplate",
       "esri/config",
 
+      // Bootstrap
+      "bootstrap/Collapse",
+      "bootstrap/Dropdown",
+
+      // Calcite Maps
+      "calcite-maps/calcitemaps-v0.8",
+      // Calcite Maps ArcGIS Support
+      "calcite-maps/calcitemaps-arcgis-support-v0.8",
+
       "dojo/dom",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, Query, dom,PointSymbol3D, esriConfig, PopupTemplate) {
+    ], function(WebScene, SceneView, Query, dom,PointSymbol3D, esriConfig, PopupTemplate, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport) {
 
 //-------------------------------------- loading agol stuff -------------------------------------------
 
@@ -55,6 +177,12 @@
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
+        padding: {
+          top: 60,
+          bottom: 0,
+          right: 23,
+          left :6
+        },
         environment: {
           lighting: {
             ambientOcclusionEnabled: true
@@ -63,11 +191,13 @@
       });
 
 
+
       view.popupManager.enabled = true;
 
       view.popup.dockOptions = {
         // Disable the dock button so users cannot undock the popup
         buttonEnabled: false,
+        position: "top-right",
         // Dock the popup when the size of the view is less than or equal to 600x1000 pixels
         breakpoint: {
           width: 600,
@@ -280,10 +410,8 @@
 
     });
   </script>
-</head>
 
-<body>
-  <div id="viewDiv"></div>
+
 </body>
 
 </html>

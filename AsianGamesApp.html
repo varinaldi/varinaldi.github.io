@@ -35,7 +35,7 @@
       position: absolute;
       font-family: 'Lato', sans-serif;
       letter-spacing: 0.4px;
-      bottom: 140px;
+      bottom: 116px;
       left: 195px;
       z-index: 1;
 
@@ -50,7 +50,7 @@
       font-size: 150%;
       border-left: 1px solid black;
       padding: 10px;
-      text-shadow: white  0.1em 0.1em 0.2em;
+
     }
 
     #logo {
@@ -78,14 +78,15 @@
       "esri/WebMap",
 
       "esri/tasks/support/Query",
+      "esri/views/ui/DefaultUI",
+      "esri/widgets/Home",
       "esri/layers/FeatureLayer",
-      "esri/symbols/PointSymbol3D",
       "esri/PopupTemplate",
 
       "dojo/dom",
       "dojo/on",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, MapView, WebMap, Query, dom,PointSymbol3D, on, PopupTemplate, FeatureLayer) {
+    ], function(WebScene, SceneView, MapView, WebMap, Query, dom, on, PopupTemplate, DefaultUI, Home, FeatureLayer) {
 
 //-------------------------------------- loading agol stuff -------------------------------------------
 
@@ -115,7 +116,6 @@
       });
 
 
-
       view.popupManager.enabled = true;
 
       view.popup.dockOptions = {
@@ -127,6 +127,9 @@
           height: 1000
         }
       };
+
+
+
 // -------------------- Scene set up done, now the other stuff --------------------------
 
     // set up point style for Cabang Olahraga
@@ -242,7 +245,12 @@
             });     // end of when venue layer is shown
       });         // end of webScene
 
+      //var homeBtn = new Home({
+        //     view: view
+          // });
 
+           // Add the home button to the top left corner of the view
+      //view.ui.add(homeBtn, "top-left");
 
     });
   </script>
@@ -315,7 +323,9 @@
                   console.log(results[0].attributes);  // prints all the client-side graphics to the console
 
                   var temparature =  document.getElementById("tempDiv");
-                  temparature.innerHTML = "<font size= 8>" + results[0].attributes.tt_air_avg + " °C</font> <br>" + "<font size= 3>Max: " + results[0].attributes.tt_air_max + " °C " + "|  Min: " + results[0].attributes.tt_air_min + " °C"  ;
+                  temparature.innerHTML = "<font size= 8> <b>" + results[0].attributes.tt_air_avg + " °C </b></font>" +
+                                          "<font size= 3><br> Max: " + results[0].attributes.tt_air_max + " °C " + "|  Min: " + results[0].attributes.tt_air_min + " °C<br>" +
+                                          "Wind Speed: " + results[0].attributes.ws_max + "km/h |  " + results[0].attributes.wd_card_EN ;
                 });
               }
             });
@@ -331,7 +341,7 @@
   <div id="viewDiv"></div>
   <div id="navDiv"></div>
   <div id="tempDiv"></div>
-  <div id="titleDiv"> <h> Gelora Bung Karno Sport Complex Guide </h></div>
+  <div id="titleDiv"> <b> Gelora Bung Karno Sport Complex Guide </b></div>
   <div id="logo"><img src='https://en.asiangames2018.id/d3images/ml/ag2018-assets/logo--desktop.svg' alt=''width=160% height=150%></div>
 
 

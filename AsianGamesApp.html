@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,width=device-width">
 
   <title>Asian Games GBK</title>
   <style>
@@ -35,20 +35,22 @@
       position: absolute;
       font-family: 'Lato', sans-serif;
       letter-spacing: 0.4px;
-      bottom: 150px;
+      bottom: 140px;
       left: 195px;
       z-index: 1;
+
     }
     #titleDiv {
       position: absolute;
       font-family: 'Lato', sans-serif;
       letter-spacing: 0.4px;
-      top: 40px;
+      top: 36px;
       left: 350px;
       z-index: 1;
       font-size: 150%;
       border-left: 1px solid black;
       padding: 10px;
+      text-shadow: white  0.1em 0.1em 0.2em;
     }
 
     #logo {
@@ -64,6 +66,7 @@
 
   <link href="https://fonts.googleapis.com/css?family=Lato:300" rel="stylesheet">
   <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <script src="https://js.arcgis.com/4.7/"></script>
 
 
@@ -97,7 +100,7 @@
       var view = new SceneView({
         container: "viewDiv",
         map: webScene,
-        
+
         padding: {
           top: 120,
           bottom: 0,

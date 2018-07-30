@@ -24,23 +24,37 @@
         "esri/Map",
         "esri/views/MapView",
         "esri/layers/FeatureLayer",
+        "esri/Basemap",
+        "esri/layers/WebTileLayer",
         "esri/renderers/smartMapping/statistics/uniqueValues",
         "dojo/domReady!"
       ],
       function(
         Map, MapView,
         FeatureLayer,
+        Basemap,
+        WebTileLayer,
         uniqueValues
       ) {
 
+        var mapBaseLayer = new WebTileLayer({
+            urlTemplate: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
+          });
+
+
+          var stamen = new Basemap({
+              baseLayers: [ mapBaseLayer ],
+              title: "Light Gray Canvas",
+              id: "Light Gray Canvas"
+            });
+
         var map = new Map({
-          basemap: "dark-gray"
+          basemap: stamen
         });
 
         var view = new MapView({
           container: "viewDiv",
           map: map,
-
           center: [ 106.8428588,-6.2498348],
           zoom:10
         });
@@ -61,44 +75,41 @@
            }
          };
 
+
         var rekapLayer = new FeatureLayer({
-          url: "https://demo.esriindonesia.co.id/arcgis/rest/services/Rekap_Kasus_2016_2017/FeatureServer/0",
-          renderer: renderer,
+          url: "http://13.76.3.201/asian_games_realtime/FeatureServer/0",
+          renderer: renderer
 
         });
 
         map.add(rekapLayer);
+        rekapLayer.outFields = ["*"];
 
         //--------- interactivity
 
-        view.whenLayerView(rekapLayer).then(function(lyrView) {
-          lyrView.watch("updating", function(val) {
-            if (!val) { // wait for the layer view to finish updating
-
-              // query all the features available for drawing.
-              lyrView.queryFeatures({
-                geometry: view.extent,
-                returnGeometry: true
-              }).then(function(results) {
-
-                results
-
-              });
-            }
-          });
-
-        });
-
-        uniqueValues({
-            layer: rekapLayer,
-            field: "SUBKATEGOR"
-          }).then(function(response){
-            // prints each unique value and the count of features containing that value
-            var infos = response.uniqueValueInfos;
-            infos.forEach(function(info){
-              console.log("SUBKATEGORI: ", info.value, " TOTAL: ", info.count);
+        view.whenLayerView(rekapLayer).then(function(layerView){
+            layerView.watch("updating", function(val){
+              if(!val){  // wait for the layer view to finish updating
+                layerView.queryFeatures().then(function(results){
+                  console.log(results[0].attributes.lon);  // prints all the client-side graphics to the console
+                });
+              }
             });
           });
+
+
+
+           uniqueValues({
+               layer: rekapLayer,
+               field: "kota"
+             }).then(function(response){
+               // prints each unique value and the count of features containing that value
+               var infos = response.uniqueValueInfos;
+               infos.forEach(function(info){
+                 console.log("SUBKATEGORI: ", info.value, " TOTAL: ", info.count);
+               });
+             });
+
 
 
       });

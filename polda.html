@@ -32,7 +32,7 @@
 
       var map = new WebMap({
         portalItem: {
-          id: "16d4190a44a24525aa1d75ee83fd3945"
+          id: "8c195fcec6634b25b2302dcda07995f3"
         }
       });
 
@@ -42,22 +42,8 @@
         container: "viewDiv"
       });
 
-      function findLayerByTitle(title) {
-        return view.map.allLayers.find(function(layer) {
-          return layer.title === title;
-        });
-      }
-
-      // When the view loads, set up UI elements
-      let rekapLayer;
-
-      view.when(function() {
-        rekapLayer = findLayerByTitle(
-          "Rekap kasus 2016 2017");
-        rekapLayer.outFields = ["*"];
-      });
-
       
+
 
 
     });

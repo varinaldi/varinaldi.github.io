@@ -24,10 +24,10 @@
 
     #navDiv {
       position: absolute;
-      bottom: 100px;
+      bottom: 106px;
       left: 50px;
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       border: 1px solid white;
       z-index: 1;
     }
@@ -35,8 +35,16 @@
       position: absolute;
       font-family: 'Lato', sans-serif;
       letter-spacing: 0.4px;
-      bottom: 116px;
-      left: 195px;
+      bottom: 146px;
+      left: 215px;
+      z-index: 1;
+    }
+    #myBtn {
+      position: absolute;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.4px;
+      bottom: 115px;
+      left: 213px;
       z-index: 1;
 
     }
@@ -44,7 +52,7 @@
       position: absolute;
       font-family: 'Lato', sans-serif;
       letter-spacing: 0.4px;
-      top: 36px;
+      top: 60px;
       left: 350px;
       z-index: 1;
       font-size: 150%;
@@ -55,10 +63,84 @@
 
     #logo {
       position: absolute;
-      top:15px;
+      top:35px;
       left: 35px;
       z-index: 1;
     }
+    .AGlogo {
+       width: 160%;
+       height auto;
+      }
+    .esri-layer-list {
+        color: $text_color;
+        background-color: $background_offset_color;
+        padding: floor($cap_spacing/2) floor($side_spacing/2);
+        overflow-y: auto;
+        width: 50px;
+        position: absolute;
+        bottom: 75px;
+        right: 15px;
+      }
+
+      .modal {
+        display: none;
+        position: fixed; /* Stay in place */
+        z-index: 99; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        position: relative;
+        background-color: rgba(0,0,0,0);
+        margin: auto;
+        padding: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 1px solid #888;
+        width: 80%;
+        height:35%;
+
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 0.4s;
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+
+    /* Add Animation */
+    @-webkit-keyframes animatetop {
+        from {bottom:-300px; opacity:0}
+        to {bottom:0; opacity:1}
+    }
+
+    @keyframes animatetop {
+        from {bottom:-300px; opacity:0}
+        to {bottom:0; opacity:1}
+    }
+
+    /* The Close Button */
+    .close {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+
+
 
 
   </style>
@@ -68,25 +150,39 @@
   <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <script src="https://js.arcgis.com/4.7/"></script>
+  <script src="https://360player.io/static/dist/scripts/embed.js" async></script>
 
 
   <script>
     require([
+      "esri/Map",
       "esri/WebScene",
       "esri/views/SceneView",
       "esri/views/MapView",
       "esri/WebMap",
 
       "esri/tasks/support/Query",
-      "esri/views/ui/DefaultUI",
-      "esri/widgets/Home",
       "esri/layers/FeatureLayer",
       "esri/PopupTemplate",
+
+      "esri/widgets/LayerList",
+      "esri/widgets/Home",
 
       "dojo/dom",
       "dojo/on",
       "dojo/domReady!"
-    ], function(WebScene, SceneView, MapView, WebMap, Query, dom, on, PopupTemplate, DefaultUI, Home, FeatureLayer) {
+    ], function(Map,
+                WebScene,
+                SceneView,
+                MapView,
+                WebMap,
+                Query,
+                PopupTemplate,
+                FeatureLayer,
+                LayerList,
+                Home,
+                dom,
+                on) {
 
 //-------------------------------------- loading agol stuff -------------------------------------------
 
@@ -103,7 +199,7 @@
         map: webScene,
 
         padding: {
-          top: 120,
+          top: 150,
           bottom: 0,
           right: 25,
           left: 25
@@ -168,17 +264,38 @@
          var sports =  webScene.layers.find(function(l) {
             return l.title === "Sports";
           });
+
+          var images =  webScene.layers.find(function(l) {
+             return l.title === "360 View";
+           });
+
+           var poi =  webScene.layers.find(function(l) {
+              return l.title === "Point of Interest";
+            });
+
           sports.elevationInfo = {
             mode: "relative-to-scene"
           };
 
           venues.renderer = venueRenderer;
-          //sports.renderer = pointsRenderer;
+
 
       // set popup for Cabang Olahraga
           sports.popupTemplate = {
             title: "<img src='{URL}' alt=''width=24 height=24>" + "<font size=6> {Cabor} </font>",
             content: "<p><font size=2.5> Venue: {Venue} <br> Capacity: <br> Phase: {Phase}  <br><br><img src='{Schedule}' alt=''width=85% height=85%> <br> <a href= '{TechBook}' target='_blank'>View Technical Handbook </a> </font></p>" };
+
+          images.popupTemplate = {
+            title: "<font size=5> {Name} </font>",
+            content: "<iframe src= '{Link}' frameborder='0' width=415 height=315 allowfullscreen data-token='{Token}' ></iframe>"};
+
+          venues.popupTemplate = {
+             title: "<font size=5> {Name} </font>",
+             content: "<font size=2.5>Capacity: {Capacity}</font>" };
+
+          poi.popupTemplate = {
+                title: "<font size=4> {Type} </font>" };
+
 
 // adding interaction when clicked
         // on click
@@ -245,104 +362,146 @@
             });     // end of when venue layer is shown
       });         // end of webScene
 
-      //var homeBtn = new Home({
-        //     view: view
-          // });
 
-           // Add the home button to the top left corner of the view
-      //view.ui.add(homeBtn, "top-left");
+      var layerList = new LayerList({
+          view: view,
+          listItemCreatedFunction: function(event) {
+          const item = event.item;
+          item.panel = {
+            content: "legend",
+            open: false
+          };
+        }
+        });
+
+
+      var homeWidget = new Home({
+          view: view
+        });
+
+      view.ui.remove("compass");
+      view.ui.add(layerList, "bottom-right");
+      view.ui.add(homeWidget, "top-left");
+
+      // Get the modal
+      var modal = document.getElementById('myModal');
+
+      // Get the button that opens the modal
+      var btn = document.getElementById("myBtn");
+
+      // Get the <span> element that closes the modal
+      var span = document.getElementsByClassName("close")[0];
+
+      // When the user clicks the button, open the modal
+      btn.onclick = function() {
+          modal.style.display = "block";
+      }
+
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
+          modal.style.display = "none";
+      }
+
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+          if (event.target == modal) {
+              modal.style.display = "none";
+          }
+      }
 
     });
   </script>
 
   <script>
-    require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/WebMap",
-        "esri/layers/FeatureLayer",
-        "dojo/domReady!"
-
-      ],
-      function(
-        Map, MapView,
-        WebMap,
-        FeatureLayer
-      ) {
-
-        var navmap = new WebMap({
-        portalItem: { // autocasts as new PortalItem()
-          id: "8c195fcec6634b25b2302dcda07995f3"
-        }
-      });
-
-        var navview = new MapView({
-          container: "navDiv",
-          map: navmap,
-
-          //center: [ 106.8428588,-6.2498348],
-          //zoom:10
-        });
-
-        navview.popup = true;
-
-
-         var renderer = {
-           type: "simple", // autocasts as new SimpleRenderer()
-           symbol: {
-             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-             size: 3,
-             color: "#fff6dd",
-             outline: { // autocasts as new SimpleLineSymbol()
-               color: [255, 196, 17, 0.4], // autocasts as new Color()
-               width: 4             }
-           }
-         };
-
-        var weather = new FeatureLayer({
-          url: "http://13.76.3.201/asian_games_realtime/FeatureServer/0",
-          renderer: renderer,
-          definitionExpression: "kota = 'Jakarta Pusat'",
-          mode: FeatureLayer.MODE_ONDEMAND,
-          refreshInterval: 0.3, //Set the interval to 1 minute
-
-        });
-
-        weather.outFields = ["*"];
-        navmap.add(weather);
-        navview.ui.components = [];
-
-        //--------- interactivity
-
-
-
-        navview.whenLayerView(weather).then(function(layerView){
-            layerView.watch("updating", function(val){
-              if(!val){  // wait for the layer view to finish updating
-                layerView.queryFeatures().then(function(results){
-                  console.log(results[0].attributes);  // prints all the client-side graphics to the console
-
-                  var temparature =  document.getElementById("tempDiv");
-                  temparature.innerHTML = "<font size= 8> <b>" + results[0].attributes.tt_air_avg + " °C </b></font>" +
-                                          "<font size= 3><br> Max: " + results[0].attributes.tt_air_max + " °C " + "|  Min: " + results[0].attributes.tt_air_min + " °C<br>" +
-                                          "Wind Speed: " + results[0].attributes.ws_max + "km/h |  " + results[0].attributes.wd_card_EN ;
-                });
-              }
-            });
-          });
+  //------------------------- add navigation webmap ------------------------
+     require([
+         "esri/Map",
+         "esri/views/MapView",
+         "esri/WebMap",
+         "esri/layers/FeatureLayer",
+         "dojo/domReady!"
+       ],
+       function(
+         Map, MapView,
+         WebMap,
+         FeatureLayer
+       ) {
+         var navmap = new WebMap({
+         portalItem: { // autocasts as new PortalItem()
+           id: "8c195fcec6634b25b2302dcda07995f3"
+         }
+       });
+         var navview = new MapView({
+           container: "navDiv",
+           map: navmap,
+           //center: [ 106.8428588,-6.2498348],
+           //zoom:10
+         });
+         navview.popup = true;
+          var renderer = {
+            type: "simple", // autocasts as new SimpleRenderer()
+            symbol: {
+              type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+              size: 3,
+              color: "#fff6dd",
+              outline: { // autocasts as new SimpleLineSymbol()
+                color: [255, 196, 17, 0.4], // autocasts as new Color()
+                width: 4             }
+            }
+          };
+         var weather = new FeatureLayer({
+           url: "http://52.148.81.212/asiangames-bmkg/featureserver/0",
+           renderer: renderer,
+           definitionExpression: "code = 'GMS'",
+           mode: FeatureLayer.MODE_ONDEMAND,
+           refreshInterval: 0.3, //Set the interval to 1 minute
+         });
+         weather.outFields = ["*"];
+         navmap.add(weather);
+         navview.ui.components = [];
+         //--------- interactivity
+         navview.whenLayerView(weather).then(function(layerView){
+             layerView.watch("updating", function(val){
+               if(!val){  // wait for the layer view to finish updating
+                 layerView.queryFeatures().then(function(results){
+                   console.log(results[0].attributes);  // prints all the client-side graphics to the console
+                   var temparature =  document.getElementById("tempDiv");
+                   temparature.innerHTML = "<font size= 8> <b>" + results[0].attributes.aws_tt_air_avg + " °C </b></font>" +
+                                           "<font size= 3><br> Max: " + results[0].attributes.aws_tt_air_max + " °C " + "|  Min: " + results[0].attributes.aws_tt_air_min + " °C<br>" +
+                                           "Wind Speed: " + results[0].attributes.aws_ws_avg + "km/h |  " + results[0].attributes.aws_wd_card_EN ;
+                    });
+               }
+             });
+           });
+       });
+   </script>
 
 
-      });
-  </script>
+
 
 </head>
 
 <body>
+
+
   <div id="viewDiv"></div>
+  <div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <iframe src= "http://dev.ps-esriid.top/bmkg/" width=100% height=100%></iframe>
+    </div>
+  </div>
   <div id="navDiv"></div>
   <div id="tempDiv"></div>
   <div id="titleDiv"> <b> Gelora Bung Karno Sport Complex Guide </b></div>
-  <div id="logo"><img src='https://en.asiangames2018.id/d3images/ml/ag2018-assets/logo--desktop.svg' alt=''width=160% height=150%></div>
+  <div id="logo"><img class = "AGlogo" src='https://en.asiangames2018.id/d3images/ml/ag2018-assets/logo--desktop.svg' alt=''></div>
+  <button id="myBtn"> <font size=3> Forecast</font></button>
+
+  <!-- The Modal -->
+
+
 
 
 </html>

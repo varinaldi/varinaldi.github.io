@@ -19,105 +19,88 @@
     }
   </style>
 
-  <script>
-    require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/FeatureLayer",
-        "esri/Basemap",
-        "esri/layers/WebTileLayer",
-        "esri/renderers/smartMapping/statistics/uniqueValues",
-        "dojo/domReady!"
-      ],
-      function(
-        Map, MapView,
-        FeatureLayer,
-        Basemap,
-        WebTileLayer,
-        uniqueValues
-      ) {
-
-        var mapBaseLayer = new WebTileLayer({
-            urlTemplate: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
-          });
 
 
-          var stamen = new Basemap({
-              baseLayers: [ mapBaseLayer ],
-              title: "Light Gray Canvas",
-              id: "Light Gray Canvas"
-            });
+        <script>
+          require([
+              "esri/Map",
+              "esri/views/MapView",
+              "esri/WebMap",
+              "esri/layers/FeatureLayer",
+              "dojo/domReady!"
 
-        var map = new Map({
-          basemap: stamen
-        });
+            ],
+            function(
+              Map, MapView,
+              WebMap,
+              FeatureLayer
+            ) {
 
-        var view = new MapView({
-          container: "viewDiv",
-          map: map,
-          center: [ 106.8428588,-6.2498348],
-          zoom:10
-        });
-
-        view.popup = true;
-        /********************
-         * Add feature layer
-         ********************/
-         var renderer = {
-           type: "simple", // autocasts as new SimpleRenderer()
-           symbol: {
-             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-             size: 3,
-             color: "#fff6dd",
-             outline: { // autocasts as new SimpleLineSymbol()
-               color: [255, 196, 17, 0.4], // autocasts as new Color()
-               width: 4             }
-           }
-         };
-
-
-        var rekapLayer = new FeatureLayer({
-          url: "http://13.76.3.201/asian_games_realtime/FeatureServer/0",
-          renderer: renderer
-
-        });
-
-        map.add(rekapLayer);
-        rekapLayer.outFields = ["*"];
-
-        //--------- interactivity
-
-        view.whenLayerView(rekapLayer).then(function(layerView){
-            layerView.watch("updating", function(val){
-              if(!val){  // wait for the layer view to finish updating
-                layerView.queryFeatures().then(function(results){
-                  console.log(results[0].attributes.lon);  // prints all the client-side graphics to the console
+              var navmap = new WebMap({
+                portalItem: { // autocasts as new PortalItem()
+                  id: "8c195fcec6634b25b2302dcda07995f3"
+                }
                 });
-              }
-            });
-          });
+
+              var navview = new MapView({
+                container: "navDiv",
+                map: navmap,
+
+                //center: [ 106.8428588,-6.2498348],
+                //zoom:10
+              });
+
+              navview.popup = true;
+
+
+               var renderer = {
+                 type: "simple", // autocasts as new SimpleRenderer()
+                 symbol: {
+                   type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+                   size: 3,
+                   color: "#fff6dd",
+                   outline: { // autocasts as new SimpleLineSymbol()
+                     color: [255, 196, 17, 0.4], // autocasts as new Color()
+                     width: 4             }
+                 }
+               };
+
+              var weather = new FeatureLayer({
+                url: "http://52.148.81.212/asiangames-bmkg/featureserver/0",
+                renderer: renderer,
+                definitionExpression: "kota = 'Jakarta Pusat'",
+                mode: FeatureLayer.MODE_ONDEMAND,
+                refreshInterval: 0.3, //Set the interval to 1 minute
+
+              });
+
+              weather.outFields = ["*"];
+              navmap.add(weather);
+              navview.ui.components = [];
+
+              //--------- interactivity
 
 
 
-           uniqueValues({
-               layer: rekapLayer,
-               field: "kota"
-             }).then(function(response){
-               // prints each unique value and the count of features containing that value
-               var infos = response.uniqueValueInfos;
-               infos.forEach(function(info){
-                 console.log("SUBKATEGORI: ", info.value, " TOTAL: ", info.count);
-               });
-             });
+              navview.whenLayerView(weather).then(function(layerView){
+                  layerView.watch("updating", function(val){
+                    if(!val){  // wait for the layer view to finish updating
+                      layerView.queryFeatures().then(function(results){
+                        console.log(results.attributes);  // prints all the client-side graphics to the console
 
 
+                      });
+                    }
+                  });
+                });
 
+  
       });
   </script>
 </head>
 
 <body>
-  <div id="viewDiv"></div>
+  <div id="navDiv"></div>
 </body>
 
 </html>

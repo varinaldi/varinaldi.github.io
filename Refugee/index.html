@@ -1,0 +1,239 @@
+<html>
+<head>
+	<title>Refugee Geovisualization</title>
+
+	<meta itemprop="name" content="DC.js + Leaflet"/>
+	<meta itemprop="description" content="DC.js + Leaflet chart"/>
+
+	<meta charset="UTF-8">
+
+	<link type="text/css" href="lib/leaflet.css" rel="stylesheet"/>
+  <link type="text/css" href="lib/dc-leaflet-legend.css" rel="stylesheet"/>
+	<link type="text/css" href="lib/dc.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+
+  <style>
+  h1 { 
+     padding: 30px;
+    text-align: center;
+    
+}
+  h2 { 
+    font-size: 15;
+    font-weight: bold;
+    text-align: center;
+}
+
+    #holder {
+      width:1150px;
+      height: 900px;
+      margin:1px auto;
+    }
+    #holder>div {
+      padding:20px 3;
+      clear:both;
+    }
+    .tabs {
+     padding:30px 3;
+     clear:both;
+
+    }
+    .map {
+      width:800px;
+      height:550px;
+      margin-top: 30px
+    }
+    .pie {
+      margin-left:80px;
+      margin-top: 50px
+    }
+    .label {
+      padding-left: 40px;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1><img src="title.png" width="700" height="100"></h1>
+<h2><i><font face="Calibri"> Ruiqi Guo, Sophie Najjar, Vivaldi Rinaldi, Peter Ryan</font></i></h2>
+
+
+
+
+
+
+<div id="holder">
+  <div id="demo3">
+
+    <div class = "tab">
+<ul class="w3-navbar w3-black">
+  <li><a href="javascript:void(0)" onclick="openCity('Overview')">Overview</a></li>
+  <li><a href="javascript:void(0)" onclick="openCity('Instructions')">Instructions</a></li>
+  <li><a href="javascript:void(0)" onclick="openCity('About Refugees')">Further Information</a></li>
+</ul>
+
+<div id="Overview" class="w3-container city">
+  <p align="justify"><font size = ".2" face = "Calibri"> Our team developed a visualization approach to analyze the distribution of oversea refugees in the U.S. We aimed to use a method that is different from a flow map or temporal map to help users gain insights at the state level. Displaying the population of each refugee group and its relative proportion to others can effectively show the pattern of refugee distribution. We hope users of this interactive application will be able to find new insights after exploring the dataset. </font></p>
+  <p align="justify"><font size = ".2" face = "Calibri">The data we used comes from the Office of Refugee Resettlement on The 2015 Served Population by State and Country of Origin. This visualization was made by using D3.js, DC.JS, Crossfilter.js and Leaflet.js. </font></p>
+  <p align="justify"><font size = ".2" face = "Calibri">Thank you for visiting our site!</font></p>
+  
+</div>
+
+<div id="Instructions" class="w3-container city">
+  <p align="justify"><font size = ".2" face = "Calibri"> The Map represents the total refuge population for each state while the pie chart represents the breakdown of refugee population by continent or major geographic region for each of the state. The map is linked to the pie chart on the right. To view the breakdown of the refugee population for a state, click on the state of interest on the map. To unselect the state, click again on the state until the brush is off. To view the the composite breakdown of multiple states, simply click on all states of interest. Mouseover the state to see the total refugee population in the state.</font></p>
+  <p align="justify"><font size = ".2" face = "Calibri">The Pie chart also functions as a continent filter for the chloropleth map. To view the distribution of specific continent origin, click on the continent portion of the chart. This will change color of each state based on the refugee population from the selected continent. Mouseover the pie chart portion to see the actual value of refugee population from the continent.</font></p>
+  <p align="justify"><font size = ".2" face = "Calibri">Due to the limitation of integrating DC.js and Leaflet, the legend for the choropleth map only shows the break value of the classifcations. A dynamic legend is something that will be pursued in further developdement. </font></p>
+</div>
+
+<div id="About Refugees" class="w3-container city">
+  <p align="justify"><font size = ".2" face = "Calibri">Since 1975, over 3 million refugees have been admitted to the United States (U.S. Department of State). Once they arrive in the country, their settlement is determined by a variety of factors. For instance, if there is a pre-existing refugee settlement from the same country, an individual is likely to be placed with a cohort of the same nationality. If they already have family members settled in the states, then they are likely to be settled with them. There are also state-level political considerations factoring into the settlement of refugees. While the federal government determines the quantity of refugees and which refugees enter the U.S every year, cooperation with state entities is necessary in allocating the social benefits and resources required to assist these populations (U.S. Dept. of Homeland Security). If a state faces budgetary constraints and cannot allocate the additional funds necessary to make up for public schooling and social services towards refugees, they may refuse to accept additional refugees.  Relationships with nonprofits and NGOs also influence the state-level distribution of refugees. Where these organizations are more prominent, refugees are more likely to be placed. As a result of  vast differences between the cultural and economic environments of the diverse fifty states, the populations of refugees at the state level are also very different. This visualization aimed to show the disparities in refugee populations from state to state, with respect to refugee arrivals in 2015. </font></p>
+</div>
+
+<script>
+openCity("London")
+function openCity(cityName) {
+    var i;
+    var x = document.getElementsByClassName("city");
+    for (i = 0; i < x.length; i++) {
+       x[i].style.display = "none";  
+    }
+    document.getElementById(cityName).style.display = "block";  
+}
+</script>
+
+</div>
+
+    <div class="map"></div>
+    <div class="pie"></div>
+    <div class= "label"><img src="pie.png" width="250" height="230"></div>
+  </div>
+</div>
+
+<script type="text/javascript" src="lib/d3.js"></script>
+<script type="text/javascript" src="lib/crossfilter.js"></script>
+<script type="text/javascript" src="lib/dc.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script type="text/javascript" src="lib/dc.leaflet.js"></script>
+<script type="text/javascript" src="lib/leaflet-legend.js"></script>
+
+<!--Optional-->
+
+<script type="text/javascript" src="dc.leaflet.js"></script>
+<script type="text/javascript">
+
+
+var demo2_geojson=false;
+var demo2=false;
+d3.json("us.json", function(data) {
+  demo2_geojson=data;
+  if (demo2)
+    drawChoropleth(demo2,demo2_geojson);
+});
+
+d3.csv("refugees_by_state.csv", function(data) {
+  demo2=data;
+  if (demo2_geojson)
+    drawChoropleth(demo2,demo2_geojson);
+});
+
+/*     Choropleth      */
+
+function drawChoropleth(data,geojson) {
+  //initialize empty array
+  dataP = [];
+ 
+    //for each element in the data 
+  data.forEach(function(d) {
+    //initialize variable
+    d.sum = 0;
+    //for record in data where record does not equal "code" or "sum" push the code, type and value into the array
+    for(var p in d)
+      if (p && p!="State") {
+        dataP.push({'State':d.State,'Continent':p,'value':+d[p]});
+        //d.sum += +d[p];
+      }
+  });
+  delete data;
+
+  var xf = crossfilter(dataP);
+  var groupname = "Choropleth";
+	var states = xf.dimension(function(d) { return d.State; });
+	var statesGroup = states.group().reduceSum(function(d) { return d.value;});
+
+   var usChartColors = d3.scale.quantize()
+                                       .domain([1, 7479])                                                                                                                                                  
+                                       .range(["#e4fce0','#cef2c8', '#89bf9a', '#679883', '#45797a', '#335965"]);             
+  
+
+  var status = false;
+
+  function flip() {
+    status = !status;
+    return status;
+    };
+
+  var button = document.createElement("button");
+  button.innerHTML = "Change Query Type";
+
+  var body = document.getElementsByTagName("body")[0];
+  body.appendChild(button);
+
+  button.addEventListener ("click", flip);
+
+ var map = dc.leafletChoroplethChart("#demo3 .map",groupname)
+
+    map.dimension(states)
+      .group(statesGroup)
+      .width(800)
+	    .height(550)
+      .center([39.82,-98.58])
+      .zoom(4)
+      .geojson(geojson)
+      .colors(['#e4fce0','#89bf9a', '#679883', '#45797a', '#295d5e','#335965', '#1b2f35'])
+      .colorDomain([0, 7479])
+      .colorAccessor(function(d,i) {
+        return d.value;
+      })
+      .featureKeyAccessor(function(feature) {
+        return feature.properties.NAME;
+      })
+      .renderPopup(true)
+      .popup(function(d,feature) {
+        return feature.properties.NAME+" Population: "+ d.value;
+      })
+      .legend(dc.leafletLegend().position('bottomright')).brushOn(true)
+
+      ;  
+
+
+
+
+
+
+	var continents = xf.dimension(function(d) { return d.Continent; });
+	var continentsGroup = continents.group().reduceSum(function(d) { return d.value;});
+
+  dc.pieChart("#demo3 .pie",groupname)
+      .dimension(continents)
+      .group(continentsGroup)
+      .width(250)
+	    .height(250)
+      .ordering(function (p) {
+        return +p.key.substr(6);
+      })
+      .colors([ '#d46565', '#5a6898', '#86a4b6', '#eae692', '#e5a5a5', '#6d8e8d'])
+	    .renderLabel(true)
+	    .renderTitle(true);
+
+      //.title()*/
+
+	dc.renderAll(groupname);
+}
+</script>
+
+
+
+</body>
+</html>

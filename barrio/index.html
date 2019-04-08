@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Select Barrio</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+
+	<style>
+	       body {
+	           padding: 0;
+	           margin: 0;
+	       }
+	       html, body, #mapid {
+	           height: 100%;
+	             width: 100%;
+         }
+	 </style>
+
+
+</head>
+<body>
+
+<script type="text/javascript" src="prbarrios.js"></script>
+
+<div id="mapid"></div>
+
+<script>
+/// create map
+	var map = L.map('mapid').setView([18.25, -66.4], 8.5);
+
+/// define basemap
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox.streets'
+	}).addTo(map);
+
+
+/// highlight function
+	function highlight (layer) {
+			layer.setStyle({
+				weight: 5,
+				opacity: 1,
+				 color: 'red'
+			});
+			if (!L.Browser.ie && !L.Browser.opera) {
+				layer.bringToFront();
+			}
+		}
+
+/// dehighlight
+		function dehighlight (layer) {
+		  if (selected === null || selected._leaflet_id !== layer._leaflet_id) {
+			  geojson.resetStyle(layer);
+		  }
+		}
+
+/// select bario
+		function select (layer) {
+		  if (selected !== null) {
+		    var previous = selected;
+		  }
+			map.fitBounds(layer.getBounds());
+			selected = layer;
+
+			feature = selected.feature;
+
+
+			var popupContent = '<b>' + feature.properties.municipio+ '</b><br />' + feature.properties.barrio;
+			layer.bindPopup(popupContent).openPopup();
+
+
+			if (previous) {
+			  dehighlight(previous);
+			}
+		}
+
+
+/// variable for selected and selected geoid
+		var selected = null;
+		var geo = null;
+
+
+// add barrio layers and assign mouse function
+		var geojson = L.geoJson(barrio, {
+				style: function (feature) {
+	  			return {
+	  				weight: 1,
+	  				opacity: 1,
+	  				color: '#666'
+	  			};
+	  		},
+				onEachFeature: function (feature, layer) {
+
+			    layer.on({
+	  		    'mouseover': function (e) {
+	  		      highlight(e.target);
+	  		    },
+	  		    'mouseout': function (e) {
+	  		      dehighlight(e.target);
+	  		    },
+	  				'click': function (e, callback) {
+							 select(e.target);
+							 geo = e.target.feature.properties.geoid;
+
+							 alert("Selected geoid " + geo)
+						}
+					});
+	  		}
+			}).addTo(map);
+
+
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>

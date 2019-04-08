@@ -108,9 +108,11 @@
 	  		    },
 	  				'click': function (e, callback) {
 							 select(e.target);
+							 municipio = e.target.feature.properties.municipio;
+							 barrio = e.target.feature.properties.barrio;
 							 geo = e.target.feature.properties.geoid;
 
-							 alert("Selected geoid " + geo)
+							 alert("Selected " + barrio + " of " + municipio + " with geoid: " + geo)
 						}
 					});
 	  		}

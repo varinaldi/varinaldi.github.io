@@ -73,7 +73,8 @@
 			feature = selected.feature;
 
 
-			var popupContent = '<b>' + feature.properties.municipio+ '</b><br />' + feature.properties.barrio;
+			var popupContent = '<b>' + feature.properties.municipio + '</b><br />' + feature.properties.barrio
+					+ '<br />' + feature.properties.geoid;
 			layer.bindPopup(popupContent).openPopup();
 
 
@@ -112,15 +113,11 @@
 							 barrio = e.target.feature.properties.barrio;
 							 geo = e.target.feature.properties.geoid;
 
-							 alert("Selected " + barrio + " of " + municipio + " with geoid: " + geo)
+							 ///alert("Selected " + barrio + " of " + municipio + " with geoid: " + geo)
 						}
 					});
 	  		}
 			}).addTo(map);
-
-
-
-
 
 
 

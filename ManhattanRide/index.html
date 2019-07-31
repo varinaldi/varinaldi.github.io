@@ -1,0 +1,42 @@
+<<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+      <<style media="screen">
+        #overL { font-size:1.3em;
+                 position:absolute;
+                 top:40px;
+                 left:20px;
+                 font-family:  Helvetica, sans-serif;
+                 color:white;
+                 z-index:2 }
+        #overR { font-size:1.3em;
+                 position:absolute;
+                 top:40px;
+                 left:51%;
+                 font-family: Helvetica, sans-serif;
+                 color:white;
+                 z-index:2}
+
+      </style>
+  </head>
+  <body>
+
+
+<!--
+    <iframe id="unserved" style="border-style: none; border-color: inherit; border-width: 0px; height:1222px; width:50%;" src="unservedDynamic.html".html"></iframe>
+    <iframe id="served" style="border-style: none; border-color: inherit; border-width: 0px; height:1222px; width:50%;" src="servedDynamic.html".html"></iframe>
+
+ -->
+
+    <div class="box"><iframe src="servedDynamic.html" frameborder="0" scrolling="no"  width="50%" height="100%" align="left"> </iframe> </div>
+
+    <div class="box"><iframe src="unservedDynamic.html" frameborder="0" scrolling="no"  width="50%" height="100%" align="left">
+        </iframe>
+
+        <div id="overL">Served Pickup Requests</div>
+        <div id="overR">Unserved Pickup Requests</div>
+
+  </body>
+</html>

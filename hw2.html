@@ -11,7 +11,7 @@
 
     <script type="text/javascript">
 
-      var mta  = fetch('http://bustime.mta.info/api/siri/vehicle-monitoring.json?key=b1078c61-7ab3-4c9a-a1c8-4aea5c4da3e9&LineRef=MTA%20NYCT_B54&DirectionRef=1');
+      var mta  = d3.json('http://bustime.mta.info/api/siri/vehicle-monitoring.json?key=b1078c61-7ab3-4c9a-a1c8-4aea5c4da3e9&LineRef=MTA%20NYCT_B54&DirectionRef=1');
       console.log(mta);
 
     </script>

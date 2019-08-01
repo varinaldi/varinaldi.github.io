@@ -26,10 +26,13 @@ var map = new mapboxgl.Map({
 
 map.on('load', function () {
 
+    // load geojson
     map.addSource('stops', { type: 'geojson', data: 'B54_stops.geojson'});
     map.addSource('route', { type: 'geojson', data: 'B54_Route.geojson'});
+    map.addSource('bus', { type: 'geojson', data: 'B54_bus.geojson'});
 
 
+    // add route
     map.addLayer({
                "id": "route",
                "type": "line",
@@ -37,11 +40,12 @@ map.on('load', function () {
                "paint": {
                        "line-width": 2,
                        "line-color": "#355C7D",
-                       "line-opacity":0.8
+                       "line-opacity":0.3
                }
 
        });
 
+    // add stops
     map.addLayer({
                "id": "stops",
                "type": "circle",
@@ -52,6 +56,32 @@ map.on('load', function () {
                }
        });
 
+
+   // add bus
+
+   map.loadImage('https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Cat_silhouette.svg/400px-Cat_silhouette.svg.png', function(error, image) {
+       if (error) throw error;
+       map.addImage('cat', image);
+       map.addLayer({
+                   "id": "bus",
+                   "type": "circle",
+                   "source": "bus",
+                   "layout": {
+                       "icon-image": "cat",
+                       "icon-size": 1
+                   }
+            });
+   })
+
+   map.addLayer({
+               "id": "bus",
+               "type": "circle",
+               "source": "bus",
+               "paint": {
+                       "circle-radius": 4,
+                       "circle-color": "#2F9599"
+                  }
+        });
 
 });
 

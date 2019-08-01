@@ -38,8 +38,8 @@ map.on('load', function () {
                "type": "line",
                "source": "route",
                "paint": {
-                       "line-width": 2,
-                       "line-color": "#355C7D",
+                       "line-width": 4,
+                       "line-color": "#E84A5F",
                        "line-opacity":0.3
                }
 
@@ -51,37 +51,29 @@ map.on('load', function () {
                "type": "circle",
                "source": "stops",
                "paint": {
-                       "circle-radius": 2,
-                       "circle-color": "#C06C84"
+                       "circle-radius": 3,
+                       "circle-color": "#F26B38"
                }
        });
 
 
    // add bus
 
-   map.loadImage('https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Cat_silhouette.svg/400px-Cat_silhouette.svg.png', function(error, image) {
+   map.loadImage('15923.png', function(error, image) {
        if (error) throw error;
-       map.addImage('cat', image);
+       map.addImage('buses', image);
        map.addLayer({
-                   "id": "cat",
-                   "type": "circle",
+                   "id": "bus",
+                   "type": "symbol",
                    "source": "bus",
                    "layout": {
-                       "icon-image": "cat",
-                       "icon-size": 0.1
+                       "icon-image": "buses",
+                       "icon-size": 0.05
                    }
             });
    })
 
-   map.addLayer({
-               "id": "bus",
-               "type": "circle",
-               "source": "bus",
-               "paint": {
-                       "circle-radius": 4,
-                       "circle-color": "#2F9599"
-                  }
-        });
+
 
 });
 

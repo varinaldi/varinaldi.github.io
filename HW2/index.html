@@ -19,7 +19,7 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4b
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
-    center: [-73.97, 40.7],
+    center: [-73.955, 40.7],
     zoom: 13
 
 });
@@ -73,6 +73,38 @@ map.on('load', function () {
             });
    })
 });
+
+
+
+map.on('click', 'bus', function (e) {
+    var coordinates = e.features[0].geometry.coordinates.slice();
+
+    var description = '<b>Vehicle: </b>'+ e.features[0].properties.VehicleRef +
+                      '<br>' +'<b>Stop: </b>'+ e.features[0].properties.StopName + '<br>' +
+                      '<b>Destination: </b>'+ e.features[0].properties.Destination + '<br>' +
+                      '<b>Status: </b>'+ e.features[0].properties.StopStatus;
+
+
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+
+    new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML( description)
+        .addTo(map);
+});
+
+// Change the cursor to a pointer when the mouse is over the places layer.
+map.on('mouseenter', 'bus', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', 'bus', function () {
+    map.getCanvas().style.cursor = '';
+});
+
 
 
 </script>

@@ -62,9 +62,13 @@
 				  });
 				});
 
+				var contentString = null;
 
 				var selected = null;
-				var infowindow = new google.maps.InfoWindow();
+				var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
 
 				function select (layer) {
 				  if (selected !== null) {
@@ -98,10 +102,10 @@
 
 						var barr = event.feature.getProperty("barrio");
 	  				var municipio = event.feature.getProperty("municipio");
-						var content = barr + ', ' + municipio;
+						var contentString = '<b>' + barr + '</b>' + ', ' + municipio;
 
-						infowindow.setContent(content);
-						infowindow.setPosition(event.feature.getGeometry().get()); // anchor the infowindow at the marker
+						infowindow.setContent(contentString);
+						infowindow.setPosition(event.latLng); // anchor the infowindow at the marker
 	 					infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
 						infowindow.open(map);
 
@@ -140,7 +144,7 @@
       }
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZqni9OW1mviJZxBKwCMmDrG0WcYM38uU&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js">
     </script>
   </body>
 </html>

@@ -19,7 +19,7 @@
 			#info-box {
 			 background-color: white;
 			 bottom: 30px;
-			 height: 30px;
+			 height: 20px;
 			 padding: 10px;
 			 position: absolute;
 			 left: 30px;
@@ -29,7 +29,7 @@
   </head>
   <body>
     <div id="map"></div>
-		<div id="info-box">Unique Geoid: </div>
+		<div id="info-box">Selected Barrio </div>
     <script>
 
       var map;
@@ -100,7 +100,7 @@
 					var municipio = event.feature.getProperty("municipio");
 
 					document.getElementById('info-box').textContent =
-      			'Unique Geoid: ' + geoid + ' ' + barr + ', ' + municipio ;
+      			barr + ', ' + municipio +' - ' + geoid;
 
         });
 

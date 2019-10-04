@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Puerto Rico Barrio</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+			#info-box {
+			 background-color: white;
+			 bottom: 30px;
+			 height: 20px;
+			 padding: 10px;
+			 position: absolute;
+			 left: 30px;
+		 }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+		<div id="info-box">unique geoid: </div>
+    <script>
+
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8,
+          center: {lat:18.25, lng: -66.4}
+        });
+
+        // Load GeoJSON.
+        map.data.loadGeoJson('pr_barrio.geojson');
+
+				// map.data.removeProperty('isSelected');
+
+				map.data.setStyle(function(feature) {
+				  var color = 'gray';
+					var opct = 0.1;
+					var stkw = 0.3;
+
+				  if (feature.getProperty('isSelected') == true) {
+				    color = 'red';
+						opct = 0.5;
+						stkw = 5;
+				  }
+
+				  return /** @type {!google.maps.Data.StyleOptions} */({
+				    fillColor: color,
+				    strokeColor: color,
+				    strokeWeight: stkw,
+						fillOpacity: opct
+				  });
+				});
+
+
+				var selected = null;
+				var infowindow = new google.maps.InfoWindow();
+
+				function select (layer) {
+				  if (selected !== null) {
+				    var previous = selected;
+				  }
+
+					selected = layer;
+
+					selected.feature.setProperty('isSelected', true);
+
+					if (previous) {
+					  previous.feature.setProperty('isSelected', false);
+					}
+				}
+
+        // When the user clicks, set 'isColorful', changing the color of the letters.
+        map.data.addListener('click', function(event) {
+
+					var bounds = new google.maps.LatLngBounds();
+
+
+			    processPoints(event.feature.getGeometry(), bounds.extend, bounds);
+			    map.fitBounds(bounds);
+
+					select(event);
+
+					var geoid  = event.feature.getProperty('geoid');
+
+					document.getElementById('info-box').textContent =
+      			'Unique Geoid: ' + event.feature.getProperty('geoid');
+
+						var barr = event.feature.getProperty("barrio");
+	  				var municipio = event.feature.getProperty("municipio");
+						var content = barr + ', ' + municipio;
+
+						infowindow.setContent(content);
+						infowindow.setPosition(event.feature.getGeometry().get()); // anchor the infowindow at the marker
+	 					infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+						infowindow.open(map);
+
+        });
+
+
+
+
+        map.data.addListener('mouseover', function(event) {
+          map.data.revertStyle();
+          map.data.overrideStyle(event.feature, {strokeWeight: 8, strokeColor:'yellow'});
+
+
+        });
+
+        map.data.addListener('mouseout', function(event) {
+          map.data.revertStyle();
+					// event.feature.setProperty('isSelected', false);
+
+        });
+
+				function processPoints(geometry, callback, thisArg) {
+					  if (geometry instanceof google.maps.LatLng) {
+					    callback.call(thisArg, geometry);
+					  } else if (geometry instanceof google.maps.Data.Point) {
+					    callback.call(thisArg, geometry.get());
+					  } else {
+					    geometry.getArray().forEach(function(g) {
+					      processPoints(g, callback, thisArg);
+					    });
+					  }
+					}
+
+			console.log(geoid);
+
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZqni9OW1mviJZxBKwCMmDrG0WcYM38uU&callback=initMap">
+    </script>
+  </body>
+</html>

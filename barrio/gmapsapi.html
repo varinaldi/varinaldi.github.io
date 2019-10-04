@@ -19,7 +19,7 @@
 			#info-box {
 			 background-color: white;
 			 bottom: 30px;
-			 height: 20px;
+			 height: 30px;
 			 padding: 10px;
 			 position: absolute;
 			 left: 30px;
@@ -100,7 +100,7 @@
 					var municipio = event.feature.getProperty("municipio");
 
 					document.getElementById('info-box').textContent =
-      			'Unique Geoid: ' + geoid + '<br>' + '<b>' + barr + '</b>' + ', ' + municipio ;
+      			'Unique Geoid: ' + geoid + ' ' + barr + ', ' + municipio ;
 
         });
 

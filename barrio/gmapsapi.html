@@ -10,7 +10,7 @@
       #map {
         height: 100%;
       }
-      /* Optional: Makes the sample page fill the window. */
+
       html, body {
         height: 100%;
         margin: 0;
@@ -23,12 +23,13 @@
 			 padding: 10px;
 			 position: absolute;
 			 left: 30px;
+			 font-family: sans-serif;
 		 }
     </style>
   </head>
   <body>
     <div id="map"></div>
-		<div id="info-box">unique geoid: </div>
+		<div id="info-box">Unique Geoid: </div>
     <script>
 
       var map;
@@ -38,11 +39,10 @@
           center: {lat:18.25, lng: -66.4}
         });
 
-        // Load GeoJSON.
+      // Load GeoJSON.
         map.data.loadGeoJson('pr_barrio.geojson');
 
-				// map.data.removeProperty('isSelected');
-
+			// set style
 				map.data.setStyle(function(feature) {
 				  var color = 'gray';
 					var opct = 0.1;
@@ -62,14 +62,13 @@
 				  });
 				});
 
-				var contentString = null;
 
+			// set dummy var and  infowindow
 				var selected = null;
-				var infowindow = new google.maps.InfoWindow({
-          content: contentString
-        });
+				var infowindow = new google.maps.InfoWindow();
 
 
+			// function to select barrio
 				function select (layer) {
 				  if (selected !== null) {
 				    var previous = selected;
@@ -84,7 +83,7 @@
 					}
 				}
 
-        // When the user clicks, set 'isColorful', changing the color of the letters.
+      // when clicked
         map.data.addListener('click', function(event) {
 
 					var bounds = new google.maps.LatLngBounds();
@@ -96,34 +95,33 @@
 					select(event);
 
 					var geoid  = event.feature.getProperty('geoid');
+					var barr = event.feature.getProperty("barrio");
+					var municipio = event.feature.getProperty("municipio");
 
 					document.getElementById('info-box').textContent =
-      			'Unique Geoid: ' + event.feature.getProperty('geoid');
-
-						var barr = event.feature.getProperty("barrio");
-	  				var municipio = event.feature.getProperty("municipio");
-						var contentString = '<b>' + barr + '</b>' + ', ' + municipio;
-
-						infowindow.setContent(contentString);
-						infowindow.setPosition(event.latLng); // anchor the infowindow at the marker
-	 					infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
-						infowindow.open(map);
+      			'Unique Geoid: ' + geoid + '<br>' + '<b>' + barr + '</b>' + ', ' + municipio ;
 
         });
 
-
-//  pls pls
-
+		// Event when mouse hover
         map.data.addListener('mouseover', function(event) {
           map.data.revertStyle();
           map.data.overrideStyle(event.feature, {strokeWeight: 8, strokeColor:'yellow'});
 
+					var barr = event.feature.getProperty("barrio");
+					var municipio = event.feature.getProperty("municipio");
+					var contentString = '<b>' + barr + '</b>' + ', ' + municipio;
+
+					infowindow.setContent(contentString);
+					infowindow.setPosition(event.latLng); // anchor the infowindow at the marker
+					infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+					infowindow.open(map);
 
         });
 
+		// Event when mouse hover out
         map.data.addListener('mouseout', function(event) {
           map.data.revertStyle();
-					// event.feature.setProperty('isSelected', false);
 
         });
 
@@ -144,7 +142,7 @@
       }
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZqni9OW1mviJZxBKwCMmDrG0WcYM38uU&callback=initMap">
     </script>
   </body>
 </html>

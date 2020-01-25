@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Jakarta flood</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
+    <script type="text/javascript" src="https://www.earthengine.app/javascript/main.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+
+
+<div id='map'></div>
+<script>
+
+var bounds = [[106.5,-6.4],
+              [107.2,-6]];
+
+mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e',
+    center: [106.838846, -6.23],
+    zoom: 11,
+    maxBounds: bounds,
+    opacity:0.3
+});
+
+var baseWidth = 2; // 20px
+var baseZoom = 11; // zoom 10
+
+map.on('load', function () {
+  var layers = map.getStyle().layers;
+  var firstSymbolId;
+  for (var i = 0; i < layers.length; i++) {
+      if (layers[i].type === 'symbol') {
+        firstSymbolId = layers[i].id;
+        break;
+      }
+  }
+    // load geojson
+    map.addSource('river', { type: 'geojson', data: 'sungai.geojson'});
+    map.addSource('lake', { type: 'geojson', data: 'danau.geojson'});
+    map.addSource('flood', { type: 'geojson', data: 'floodAll.geojson'});
+    map.addSource('kecamatan', { type: 'geojson', data: 'mask.geojson'});
+    map.addSource('eos', { type: 'geojson', data: 'eos.geojson'});
+    map.addSource('mask', { type: 'geojson', data: 'mask.geojson'});
+
+
+
+
+    map.addLayer({
+                  "id": "Floods",
+                  "type": "fill",
+                  "source": "flood",
+                  "paint": {
+                           "fill-color": "#166fab",
+                           "fill-opacity":0.5}
+          });
+
+    // map.addLayer({
+    //               "id": "FloodsRef",
+    //               "type": "fill",
+    //               "source": "eos",
+    //               "paint": {
+    //                        "fill-color": "#093c8f",
+    //                        "fill-opacity":0.5}
+    //       }, firstSymbolId);
+
+    // add rivers
+    map.addLayer({
+               "id": "Rivers",
+               "type": "line",
+               "source": "river",
+               "paint": {
+                       "line-width": {
+                              "type": "exponential",
+                              "base": 2,
+                              "stops": [
+                                  [0, baseWidth * Math.pow(2, (0 - baseZoom))],
+                                  [24, baseWidth * Math.pow(2, (24 - baseZoom))]
+                              ]
+                          },
+                       "line-color": "#b2daed",
+                       "line-opacity":0.4}
+       },firstSymbolId);
+
+   map.addLayer({
+                "id": "Lakes",
+                "type": "fill",
+                "source": "lake",
+                "paint": {
+                        "fill-color": "#b2daed",
+                        "fill-opacity":0.6}
+       }, firstSymbolId);
+
+
+   map.addLayer({
+                 "id": "masked",
+                 "type": "fill",
+                 "source": "mask",
+                 "paint": {
+                       "fill-color": "#ffffff",
+                       "fill-opacity":0.5}
+            });
+
+  map.addLayer({
+                "id": "Kecamatan",
+                "type": "line",
+                "source": "kecamatan",
+                "paint": {
+                      "line-width": 4,
+                      "line-color": "#a3a3a2",
+                      "line-opacity":0.3}
+           });
+
+});
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

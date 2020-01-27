@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JAKARTA FLOOD 2020</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      L.mapbox.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+
+
+      var map = L.mapbox
+        .map('map')
+        .setView([-6.2, 106.83],11.5)
+        .addLayer(L.mapbox.styleLayer('mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e'));
+
+        
+        var flood = L.mapbox.featureLayer().addTo(map)
+                    .loadURL('floodAll.geojson');
+
+        flood.setStyle({
+            Color: '#b2daed',
+            fillOpacity: 0.2,
+            weight: 0.5
+        });
+
+
+
+
+      L.mapbox
+        .legendControl({ position: 'topright' })
+        .addLegend('<strong>My walk from the White House to the hill!</strong>')
+        .addTo(map);
+
+
+    </script>
+  </body>
+</html>

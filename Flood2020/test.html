@@ -6,13 +6,11 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
     <script src="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js"></script>
-    <link
-      href="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css"
-      rel="stylesheet"
-    />
+    <link href="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css"
+      rel="stylesheet"/>
+
     <style>
       body {
         margin: 0;
@@ -24,35 +22,85 @@
         bottom: 0;
         width: 100%;
       }
+      .map-legends.wax-legends {
+          z-index: 2;
+          background-color: transparent;
+          padding: 10px;
+          /* border: 1px solid #999; */
+          text-align: left;
+          /* line-height: 11px; */
+          padding-left: 10px;
+          font-size: 1px;
+        }
+
     </style>
   </head>
   <body>
+
+    <div id='Text'>
+      <h1><b>JAKARTA FLOOD 2020</b></h1>
+      <p>On the first day of 2020, Jakarta and the surrounding metropolitan area experienced heavy rainfall which resulted in flood in many areas of the city.
+        This flood map was created by comparing ESA Sentinel-1 Synthetic Aperture Radar images from January 2, 2020 and other images from 2019 on Google Earth Engine as well as ESA SNAP.
+      <!-- <p> The application and methodology in detecting urban flooding with Sentinel 1 images is still a topic of research due to -->
+    </div>
+
     <div id="map" class="map"></div>
     <script>
       L.mapbox.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
 
+      var bounds = [[-6,107.15], [-6.4, 106.5]];
 
       var map = L.mapbox
         .map('map')
-        .setView([-6.2, 106.83],11.5)
+        .setView([-6.2, 106.83],10.5)
+        .setMaxBounds(bounds)
+        .setMinZoom(10.5)
         .addLayer(L.mapbox.styleLayer('mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e'));
 
-        
-        var flood = L.mapbox.featureLayer().addTo(map)
-                    .loadURL('floodAll.geojson');
-
-        flood.setStyle({
-            Color: '#b2daed',
-            fillOpacity: 0.2,
-            weight: 0.5
-        });
 
 
+        var mask = L.mapbox.featureLayer()
+                .loadURL('mask.geojson').addTo(map)
+                .on('ready', function() {
+                    mask.setStyle({fillColor:'#ffffff',
+                                  weight:0,
+                                  opacity:0.6});
+                  });
 
+        var river = L.mapbox.featureLayer()
+                .loadURL('sungai.geojson').addTo(map)
+                .on('ready', function() {
+                    river.setStyle({color:'#54c6ff',
+                                  weight:2,
+                                  opacity:0.2});
+                  });
+
+        var flood = L.mapbox.featureLayer()
+                .loadURL('floodAll.geojson').addTo(map)
+                .on('ready', function() {
+                    flood.setStyle({fillColor:'#166fab',
+                                  weight:0,
+                                  fillOpacity:0.5});
+                  });
+
+        var eos = L.mapbox.featureLayer()
+                .loadURL('eos.geojson')
+                .on('ready', function() {
+                    eos.setStyle({fillColor:'#54c6ff',
+                                  weight:0,
+                                  fillOpacity:0.5});
+                  });
+
+
+
+      L.control.layers(null,{
+            'Flood':flood,
+            'EOS-SG Flood': eos
+        }).addTo(map);
 
       L.mapbox
-        .legendControl({ position: 'topright' })
-        .addLegend('<strong>My walk from the White House to the hill!</strong>')
+        .legendControl({ position: 'bottomleft' })
+        .addLegend(document.getElementById('Text').innerHTML)
         .addTo(map);
 
 

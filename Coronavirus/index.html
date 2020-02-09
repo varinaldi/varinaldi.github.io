@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Coronavirus ew</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css"rel="stylesheet"/>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .mapboxgl-popup-content {
+        font: 'Overpass Bold', 'Helvetica Neue', Sans-serif;
+        /* padding: 0; */
+        width: 180px;
+      }
+
+      h1 {
+        font-size: 4vmin;
+        line-height: 4.5vmin;
+        letter-spacing: 0.5px;
+      }
+
+      h2 {
+        font-size: 2vmin;
+        line-height: 2.5vmin;
+        letter-spacing: 0.5px;
+      }
+
+      a {
+        text-decoration: none;
+        color: #2dc4b2;
+      }
+
+
+      #title {
+        position: absolute;
+        /* padding: 5px; */
+        top: 0%;
+        left: 3%;
+        right:50%;
+        width: 45vw;
+        margin: 10px;
+        /* background-color: rgba(0,0,0,0.1); */
+        background-color: null;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);;
+
+        font-size: 2vmin;
+        line-height: 3vmin;
+      }
+
+      #info {
+        position: absolute;
+        /* padding: 5px; */
+        top: 25%;
+        left: 3%;
+        right:50%;
+        width: 10vmin;
+      }
+      .circle {
+        margin-top: 25px;
+        margin-bottom:: 25px;
+        width: 10vmin;
+        height: 10vmin;
+        top:10%;
+        border-radius: 50%;
+        font-size: 1.5vmin;
+        color: #fff;
+        line-height: 2vmin;
+        text-align: center;
+        background: #000;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        /* margin: 10px; */
+      }
+      #console {
+        position: absolute;
+        bottom: 10%;
+        left: 3%;
+        right:50%;
+        width: 30vmin;
+        /* margin: 10px; */
+        /* padding: 10px 20px; */
+        background-color: null;
+        font-size: 2vmin;
+        /* line-height: 10px; */
+      }
+      .session {
+        /* margin-bottom: 5px; */
+      }
+      .row {
+        height: 12px;
+        width: 100%;
+      }
+
+      .colors {
+        background: linear-gradient(
+          to right,
+          #2dc4b2,
+          #3bb3c3,
+          #669ec4,
+          #8b88b6,
+          #a2719b,
+          #aa5e79
+        );
+        margin-bottom: 5px;
+      }
+
+      .label {
+        width: 15%;
+        display: inline-block;
+        text-align: center;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <div id="title">
+    <h1>2019-nCoV Coronavirus Global Outbreak</h1>
+
+    The near real-time case distribution data is retrieved from
+    <b>CSSE John Hopkins University</b> <a href="https://www.arcgis.com/home/item.html?id=c0b356e20b30490c8b8b4c7bb9554e7c"> FeatureLayer</a>.
+    The circle radius and opacity dynamicaly represent the size of the confirmed cases per reported location.
+    </div>
+
+    <div id="info">
+      <div id="c1" class="circle"></div>
+      <div id="c2" class="circle"></div>
+      <div id="c3" class="circle"></div>
+      <div id="c4" class="circle"></div>
+    </div>
+
+    <div id="console">
+      <div class="session">
+        <h2>Confirmed Deaths</h2>
+        <div class="row colors"></div>
+        <div class="row labels">
+          <div class="label">0</div>
+          <div class="label">1</div>
+          <div class="label">2</div>
+          <div class="label">3</div>
+          <div class="label">4</div>
+          <div class="label">5+</div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script>
+      mapboxgl.accessToken =
+      'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+      // This adds the map to your page
+      var map = new mapboxgl.Map({
+        container: 'map', // container id specified in the HTML
+        style: 'mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e', // style URL
+        center: [114.348337, 30.411839 ], // initial map center in [lon, lat]
+        zoom: 2.5,
+        maxZoom:3,
+        minZoom:2
+      });
+
+      var url  = 'https://services1.arcgis.com/0MSEUqKaxRlEPj5g/ArcGIS/rest/services/ncov_cases/FeatureServer/1/query?where=1=1&outFields=*&outSR=4326&f=geojson'
+
+      // var data = d3.json(url)
+      d3.json(url,function(data) {
+        var Confirmed = 0;
+        var Deaths = 0;
+        var Recovered = 0;
+        var country = [];
+
+        for (x in data.features) {
+            Confirmed += data.features[x].properties.Confirmed;
+            Recovered += data.features[x].properties.Recovered;
+            Deaths += data.features[x].properties.Deaths;
+            country.push( data.features[x].properties.Country_Region);
+        }
+
+        console.log(Confirmed);
+        console.log(Deaths);
+
+        var format = d3.format(",");
+
+        var uniqueCountry = country.filter(function(item, pos){
+          return country.indexOf(item)== pos;
+        });
+
+        console.log(uniqueCountry.length);
+
+        d3.select('#c1')
+            .html('<b><br>'  + uniqueCountry.length + '</b><br>Countries affected</b>');
+
+        d3.select('#c2')
+            .html('<b><br>' + format(Confirmed) + '</b><br>Confirmed Cases');
+
+
+        d3.select('#c3')
+            .html('<b><br>' + format(Recovered) + '</b><br>Recovered');
+
+        d3.select('#c4')
+            .html('<b><br>' + format(Deaths) + '</b><br>Deaths <br>Globaly');
+              // '<h1>2019-nCoV Coronavirus Global Outbreak</h1>' +
+              //
+              // 'The near real-time case distribution data is retrieved from '+
+              // '<b>CSSE John Hopkins University</b> <a href="https://www.arcgis.com/home/item.html?id=c0b356e20b30490c8b8b4c7bb9554e7c"> FeatureLayer</a>. The circle radius and opacity dynamicaly represent the size of the confirmed cases per reported location.'
+
+              // // 'countries with a total of ' +
+              // '<h2>' + format(Confirmed) + ' Cases confirmed</h2>'+
+              //
+              // '<h2>' + format(Recovered) + ' Recovered </h2>' +
+              // '<h2>'+ Deaths + ' Deaths globaly </h2>');
+
+
+
+
+      });
+
+
+      map.on('load', function() {
+        var layers = map.getStyle().layers;
+        var firstSymbolId;
+        for (var i = 0; i < layers.length; i++) {
+            if (layers[i].type === 'symbol') {
+              firstSymbolId = layers[i].id;
+              break;
+            }
+        }
+
+        map.addLayer({
+          id: 'corona',
+          type: 'circle',
+          source: {
+            type: 'geojson',
+            data:  url
+          },
+          paint: {
+            "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                2, [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "Confirmed"],
+                        1, 6,
+                        500, 20
+                ],
+                3, [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "Confirmed"],
+                        1, 6,
+                        2000, 25
+                     ]
+            ],
+            'circle-color': [
+              'interpolate',
+              ['exponential', 1],
+              ['number', ['get', 'Deaths']],
+              0,'#2DC4B2',
+              1,'#3BB3C3',
+              2,'#669EC4',
+              3,'#8B88B6',
+              4,'#A2719B',
+              5,'#AA5E79'
+            ],
+            'circle-opacity': [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                2, [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "Confirmed"],
+                        1, 0.4,
+                        10000, 0.8
+                ],
+                3, [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "Confirmed"],
+                        0, 0.8,
+                        10000, 0.8
+                     ]
+            ]
+          }
+        },firstSymbolId);
+      });
+
+      //  Add Popup
+      map.on('click', 'corona', function (e) {
+
+        map.flyTo({ center: e.features[0].geometry.coordinates, speed: 0.3, });
+
+        if (e.features[0].properties.Province_State == 'null') {
+          var region = '<font size="3"> <b>' + e.features[0].properties.Country_Region + '</b></font>';
+          } else {
+          var region = '<font size="3"><b>'+ e.features[0].properties.Province_State + ', ' + e.features[0].properties.Country_Region + '</b></font>';
+          }
+
+        if (e.features[0].properties.Confirmed  > 1) {
+          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Cases and ';
+          } else {
+          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Case and ';
+          }
+
+        if (e.features[0].properties.Confirmed  > 1) {
+          var ded = '<b>'+ e.features[0].properties.Deaths + ' </b>'+'Deaths' ;
+          } else {
+          var ded = '<b>'+ e.features[0].properties.Deaths + ' </b>'+'Death' ;
+          }
+
+        new mapboxgl.Popup()
+          .setLngLat(e.features[0].geometry.coordinates)
+          .setHTML(
+              region + '<br>'+ cases+ '<br>' + ded + '<br>'+
+             ' <b>'+ e.features[0].properties.Recovered +' </b>' + ' Recovered'
+
+              )
+
+          .addTo(map);
+
+        map.on('mouseenter', 'symbols', function() {
+          map.getCanvas().style.cursor = 'pointer';
+          });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'symbols', function() {
+          map.getCanvas().style.cursor = '';
+          });
+
+      });
+
+
+
+      map.addControl(new mapboxgl.NavigationControl());
+
+      // add locate
+      let geolocate = new mapboxgl.GeolocateControl({
+          positionOptions: {
+              enableHighAccuracy: true,
+              watchPosition: false
+          }
+      });
+
+
+      map.addControl(geolocate);
+    </script>
+  </body>
+</html>

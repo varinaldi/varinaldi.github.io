@@ -16,5 +16,3 @@ Some visualizations you may be interested to see
 
 
 I also did some visualizations with Esri ArcGIS JS when I was working for Esri Indonesia. Unfortunately, they are no longer accessible (they lock me out lol).
-
-Will add more stuff later on!

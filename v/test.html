@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Valentine's</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+
+// var bounds = [
+// [-74.41, 40.38], // Southwest coordinates
+// [-73.519, 40.97]  // Northeast coordinates
+// ];
+
+	mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+	var map = new mapboxgl.Map({
+			container: 'map',
+			style: 'mapbox://styles/vivaldi/ck6mx1p2k1k341iqmn3gzoi3x',
+			zoom: 14.5,
+			pitch: 50,
+			// bearing: 10.6,
+			center: [15.387, 43.9787],
+			// maxBounds: bounds
+
+	});
+		// 43.978734,15.384636
+    map.on('load', function() {
+        map.loadImage(
+            'imagee.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('us', image);
+                map.addSource('point', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': [
+                            {
+                                'type': 'Feature',
+                                'geometry': {
+                                    'type': 'Point',
+                                    'coordinates': [15.384636, 43.978734]
+                                }
+                            }
+                        ]
+                    }
+                });
+                map.addLayer({
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'point',
+                    'layout': {
+                        'icon-image': 'us',
+                        'icon-size': 0.1
+                    }
+                });
+            }
+        );
+    });
+</script>
+
+</body>
+</html>

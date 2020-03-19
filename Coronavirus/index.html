@@ -153,10 +153,10 @@
         <div class="row labels">
           <div class="label">0</div>
           <div class="label">1</div>
-          <div class="label">2</div>
           <div class="label">3</div>
-          <div class="label">4</div>
-          <div class="label">5+</div>
+          <div class="label">5</div>
+          <div class="label">10</div>
+          <div class="label">30+</div>
         </div>
       </div>
     </div>
@@ -172,7 +172,7 @@
         style: 'mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e', // style URL
         center: [114.348337, 30.411839 ], // initial map center in [lon, lat]
         zoom: 2.5,
-        maxZoom:3,
+        maxZoom:3.5,
         minZoom:2
       });
 
@@ -195,6 +195,7 @@
         console.log(Confirmed);
         console.log(Deaths);
 
+
         var format = d3.format(",");
 
         var uniqueCountry = country.filter(function(item, pos){
@@ -215,19 +216,6 @@
 
         d3.select('#c4')
             .html('<b><br>' + format(Deaths) + '</b><br>Deaths <br>Globally');
-              // '<h1>2019-nCoV Coronavirus Global Outbreak</h1>' +
-              //
-              // 'The near real-time case distribution data is retrieved from '+
-              // '<b>CSSE John Hopkins University</b> <a href="https://www.arcgis.com/home/item.html?id=c0b356e20b30490c8b8b4c7bb9554e7c"> FeatureLayer</a>. The circle radius and opacity dynamicaly represent the size of the confirmed cases per reported location.'
-
-              // // 'countries with a total of ' +
-              // '<h2>' + format(Confirmed) + ' Cases confirmed</h2>'+
-              //
-              // '<h2>' + format(Recovered) + ' Recovered </h2>' +
-              // '<h2>'+ Deaths + ' Deaths globaly </h2>');
-
-
-
 
       });
 
@@ -258,15 +246,21 @@
                         "interpolate",
                         ["linear"],
                         ["get", "Confirmed"],
-                        1, 6,
-                        500, 20
+                        1, 4,
+                        100, 6,
+                        1000, 10,
+                        4000, 15,
+                        40000, 30
                 ],
                 3, [
                         "interpolate",
                         ["linear"],
                         ["get", "Confirmed"],
-                        1, 6,
-                        2000, 25
+                        1, 4,
+                        100, 10,
+                        1000, 15,
+                        4000, 20,
+                        40000,40
                      ]
             ],
             'circle-color': [
@@ -275,28 +269,28 @@
               ['number', ['get', 'Deaths']],
               0,'#2DC4B2',
               1,'#3BB3C3',
-              2,'#669EC4',
-              3,'#8B88B6',
-              4,'#A2719B',
-              5,'#AA5E79'
+              3,'#669EC4',
+              5,'#8B88B6',
+              10,'#A2719B',
+              30,'#AA5E79'
             ],
             'circle-opacity': [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                2, [
-                        "interpolate",
-                        ["linear"],
-                        ["get", "Confirmed"],
-                        1, 0.4,
-                        10000, 0.8
-                ],
                 3, [
                         "interpolate",
                         ["linear"],
                         ["get", "Confirmed"],
+                        1, 0.4,
+                        5000, 0.8
+                ],
+                4, [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "Confirmed"],
                         0, 0.8,
-                        10000, 0.8
+                        5000, 0.8
                      ]
             ]
           }
@@ -315,9 +309,9 @@
           }
 
         if (e.features[0].properties.Confirmed  > 1) {
-          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Cases and ';
+          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Cases';
           } else {
-          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Case and ';
+          var cases = '<b>'+e.features[0].properties.Confirmed + '</b>' +' Confirmed Case';
           }
 
         if (e.features[0].properties.Confirmed  > 1) {

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Nyalaliska Utomo</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+    #map {
+        position: fixed;
+        width: 50%;
+        top: 0;
+        bottom: 0;
+    }
+    #features {
+        width: 50%;
+        margin-left: 50%;
+        font-family: sans-serif;
+        overflow-y: scroll;
+        background-color: #ffffff;
+    }
+    section {
+        padding: 255px 10px;
+        line-height: 25px;
+        /* border-bottom: 1px solid #ddd; */
+        opacity: 0;
+        font-size: 13px;
+    }
+    section.active {
+        opacity: 1;
+    }
+    section:last-child {
+        border-bottom: none;
+        margin-bottom: 500px;
+    }
+    .img-container {
+       text-align: center;
+     }
+</style>
+
+<div id="map"></div>
+<div id="features">
+    <section id="intro" class="active">
+
+      <div class="img-container">
+            <img src="intro.png" width="100%" height="100%">
+      </div>
+
+    </section>
+    <section id="pennstate">
+
+      <div class="img-container">
+            <img src="PennC.png" width="95%" height="95%">
+      </div>
+
+    </section>
+    <section id="Steidle">
+      <div class="img-container">
+            <img src="researchpsu.png" width="95%" height="95%">
+      </div>
+    </section>
+    <section id="Paterno">
+      <div class="img-container">
+            <img src="lifepenn.png" width="95%" height="95%">
+      </div>
+    </section>
+    <!-- <section id="OldMain">
+      <img src="pennstate.png" width="60%" height="60%">
+    </section> -->
+    <section id="Ithaca">
+      <div class="img-container">
+            <img src="CornellC.png" width="90%" height="90%">
+      </div>
+    </section>
+    <section id="Cornell">
+      <div class="img-container">
+            <img src="researchcornell.png" width="90%" height="90%">
+      </div>
+    </section>
+    <section id="Kimball">
+			<div class="img-container">
+						<img src="lifecornell.png" width="90%" height="90%">
+			</div>
+    </section>
+
+		<!-- end section -->
+    <section id="outro">
+			<div class="img-container">
+						<img src="ppp.png" width="70%" height="70%">
+			</div>
+    </section>
+    <section id="mentoring">
+      <div class="img-container">
+            <img src="mentoring.png" width="85%" height="85%">
+      </div>
+    </section>
+    <section id="diversity">
+      <div class="img-container">
+            <img src="diversity.png" width="85%" height="85%">
+      </div>
+    </section>
+    <section id="professional">
+      <div class="img-container">
+            <img src="professional.png" width="95%" height="95%">
+      </div>
+    </section>
+    <section id="asean">
+      <div class="img-container">
+            <img src="asean.png" width="85%" height="85%">
+      </div>
+    </section>
+		<section id="end">
+      <div class="img-container">
+            <img src="End.png" width="95%" height="95%">
+      </div>
+    </section>
+
+</div>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/vivaldi/ck5u0x41x0ry01iquc0zwvo1e',
+        center: [-76.958901, 41.581522],
+        zoom: 5.5,
+        bearing: 27,
+        pitch: 45
+    });
+
+    var psu = new mapboxgl.Marker()
+        .setLngLat([-76.485127, 42.447656])
+        .addTo(map);
+
+    var cu = new mapboxgl.Marker()
+        .setLngLat([-77.862779, 40.796436])
+        .addTo(map);
+
+    var chapters = {
+        'intro': {
+            bearing: 27,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'pennstate': {
+            duration: 6000,
+            center: [ -77.857222, 40.803481],
+            bearing: 317,
+            zoom: 12,
+            pitch: 0
+        },
+        'Steidle': {
+            bearing: 90,
+            center: [-77.865261, 40.795205],
+            zoom: 18,
+            speed: 0.6,
+            pitch: 50
+        },
+        'Paterno': {
+            bearing: 310,
+            duration: 6000,
+            speed: 0.6,
+            center: [-77.862546, 40.796230],
+            zoom: 16.5
+        },
+
+        'Ithaca': {
+            center: [ -76.479456, 42.448278],
+            bearing: 317,
+            zoom: 12.3
+        },
+        'Cornell': {
+            bearing: 90,
+            center: [-76.484994, 42.445639],
+            zoom: 17.3,
+            pitch: 40
+        },
+        'Kimball': {
+            bearing: 90,
+            center: [-76.483320, 42.444198],
+            zoom: 13.3,
+            pitch: 210
+        },
+        'outro': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'mentoring': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'diversity': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'professional': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'asean': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 20
+        },
+        'end': {
+            bearing: 27,
+            duration: 6000,
+            center: [-76.958901, 41.581522],
+            zoom: 5.5,
+            pitch: 45
+        }
+    };
+
+    // On every scroll event, check which element is on screen
+    window.onscroll = function() {
+        var chapterNames = Object.keys(chapters);
+        for (var i = 0; i < chapterNames.length; i++) {
+            var chapterName = chapterNames[i];
+            if (isElementOnScreen(chapterName)) {
+                setActiveChapter(chapterName);
+                break;
+            }
+        }
+    };
+
+    var activeChapterName = 'intro';
+    function setActiveChapter(chapterName) {
+        if (chapterName === activeChapterName) return;
+
+        map.flyTo(chapters[chapterName]);
+
+        document.getElementById(chapterName).setAttribute('class', 'active');
+        document.getElementById(activeChapterName).setAttribute('class', '');
+
+        activeChapterName = chapterName;
+    }
+
+    function isElementOnScreen(id) {
+        var element = document.getElementById(id);
+        var bounds = element.getBoundingClientRect();
+        return bounds.top < window.innerHeight && bounds.bottom > 0;
+    }
+</script>
+
+</body>
+</html>

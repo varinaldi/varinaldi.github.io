@@ -46,7 +46,7 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/vivaldi/ckoaxcl3x0kaq17qt08pl4jiu',
+    style: 'mapbox://styles/vivaldi/cl967ym8p002c14jrt797xctr',
     center: [51.53, 25.3],
     zoom: 13.5,
     pitch:60,
@@ -71,7 +71,7 @@ map.on('load', () => {
     'type': 'fill-extrusion',
     'source': 'building',
     'paint': {
-    // 'fill-extrusion-opacity':0.8,
+    'fill-extrusion-opacity':0.6,
     'fill-extrusion-color':'#ced5e0',
     // "fill-extrusion-color": [
   // "case",
@@ -82,11 +82,11 @@ map.on('load', () => {
       }   
   });
 
-  map.style.stylesheet.layers.forEach(function(layer) {
-    if (layer.type === 'symbol') {
-        map.removeLayer(layer.id);
-    }
-  });
+  // map.style.stylesheet.layers.forEach(function(layer) {
+  //   if (layer.type === 'symbol') {
+  //       map.removeLayer(layer.id);
+  //   }
+  // });
 });
 
 map.addControl(new MapboxGeocoder({

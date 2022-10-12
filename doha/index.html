@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>DOHA 3D</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+
+        #floating-panel {
+          position: absolute;
+          bottom: 5%;
+          left: 3%;
+          right:50%;
+          z-index: 2;
+          background-color: transparent;
+          padding: 10px;
+          /* border: 1px solid #999; */
+          text-align: left;
+          /* line-height: 30px; */
+          padding-left: 10px;
+        }
+
+        h1 {font-size: 3vw;
+            font-family: 'Helvetica','sans-serif';
+            letter-spacing: 2px;
+          }
+        p {font-size: 1.5vw;
+            line-height: 150%;}
+
+    </style>
+</head>
+<body>
+
+
+
+<div id='map'></div>
+<script>
+// var bounds = [[106.5,-6.45],
+//               [107.15,-6]];
+
+mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/vivaldi/ckoaxcl3x0kaq17qt08pl4jiu',
+    center: [51.53, 25.3],
+    zoom: 13.5,
+    pitch:60,
+    bearing: 5000,
+    // maxBounds: bounds,
+    opacity:0.3
+});
+
+// var baseWidth = 2; // 20px
+// var baseZoom = 11; // zoom 10
+
+
+map.on('load', () => {
+  map.addSource('building', {
+  type: 'geojson',
+  // Use a URL for the value for the `data` property.
+  data: 'doha.geojson'
+  });
+  
+  map.addLayer({
+    'id': 'earthquakes-layer',
+    'type': 'fill-extrusion',
+    'source': 'building',
+    'paint': {
+    // 'fill-extrusion-opacity':0.8,
+    'fill-extrusion-color':'#ced5e0',
+    // "fill-extrusion-color": [
+  // "case",
+  // ["==", ["get", "height"], null],
+  // "white",
+  // ["step", ["get", "height"], "#deebf7", 0, "#9ecae1", 50, "#3182bd"]
+    'fill-extrusion-height':['get', 'height']
+      }   
+  });
+
+  map.style.stylesheet.layers.forEach(function(layer) {
+    if (layer.type === 'symbol') {
+        map.removeLayer(layer.id);
+    }
+  });
+});
+
+map.addControl(new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+}));
+map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+map.addControl(new mapboxgl.GeolocateControl());
+
+
+</script>
+
+<!-- <div id='floating-panel'>
+  <h1><b>JAKARTA FLOOD 2020</b></h1>
+  <p>On the first day of 2020, Jakarta and the surrounding metropolitan area experienced heavy rainfall which resulted in flood in many areas of the city.
+    This flood map was created by comparing ESA Sentinel-1 Synthetic Aperture Radar images from January 2, 2020 and other images from 2019 on Google Earth Engine as well as ESA SNAP.
+  <!-- <p> The application and methodology in detecting urban flooding with Sentinel 1 images is still a topic of research due to -->
+<!-- </div> --> -->
+
+
+</body>
+</html>

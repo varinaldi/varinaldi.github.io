@@ -65,9 +65,15 @@ map.on('load', () => {
   // Use a URL for the value for the `data` property.
   data: 'doha.geojson'
   });
+
+  map.addSource('street', {
+  type: 'geojson',
+  // Use a URL for the value for the `data` property.
+  data: 'doha_st.geojson'
+  });
   
   map.addLayer({
-    'id': 'earthquakes-layer',
+    'id': 'building-layer',
     'type': 'fill-extrusion',
     'source': 'building',
     'paint': {
@@ -79,6 +85,15 @@ map.on('load', () => {
   // "white",
   // ["step", ["get", "height"], "#deebf7", 0, "#9ecae1", 50, "#3182bd"]
     'fill-extrusion-height':['get', 'height']
+      }   
+  });
+
+  map.addLayer({
+    'id': 'street-layer',
+    'type': 'fill-extrusion',
+    'source': 'street',
+    'paint': {
+      'line-width': 3,
       }   
   });
 

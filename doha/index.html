@@ -31,7 +31,31 @@
           }
         p {font-size: 1.5vw;
             line-height: 150%;}
-
+        .legend {
+            background-color: rgb(142, 165, 192);
+            border-radius: 3px;
+            bottom: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font: 14px/24px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            padding: 10px;
+            position: absolute;
+            color: white;
+            right: 10px;
+            z-index: 1;
+            }
+            
+        .legend h4 {
+            margin: 0 0 10px;
+            color: white;
+            }
+            
+        .legend div span {
+            border-radius: 50%;
+            display: inline-block;
+            height: 10px;
+            margin-right: 5px;
+            width: 10px;
+            }
     </style>
 </head>
 <body>
@@ -39,6 +63,17 @@
 
 
 <div id='map'></div>
+<div id="road-legend" class="legend">
+  <h4>Traffic Volume</h4>
+  <div><span style="background-color: red"></span>5000</div>
+  <div><span style="background-color: yellow"></span>3000</div>
+  <div><span style="background-color: lime"></span>2000</div>
+  <div><span style="background-color: cyan"></span>1000</div>
+  <div><span style="background-color: royalblue"></span>500</div>
+  <div><span style="background-color: blue"></span>100</div>
+
+</div>
+
 <script>
 // var bounds = [[106.5,-6.45],
 //               [107.15,-6]];
@@ -78,7 +113,7 @@ map.on('load', () => {
     'source': 'building',
     'paint': {
     'fill-extrusion-opacity':0.6,
-    'fill-extrusion-color':'#ced5e0',
+    'fill-extrusion-color':'#ebe3dd',
     // "fill-extrusion-color": [
   // "case",
   // ["==", ["get", "height"], null],
@@ -90,10 +125,29 @@ map.on('load', () => {
 
   map.addLayer({
     'id': 'street-layer',
-    'type': 'fill-extrusion',
+    'type': 'line',
     'source': 'street',
     'paint': {
+      // 'line-color': '#888',
       'line-width': 3,
+      'line-color': [
+        'interpolate',
+        ['linear'],
+        ['get','probCount'],
+        100,
+        'blue',
+        500,
+        'royalblue',
+        1000,
+        'cyan',
+        2000,
+        'lime',
+        3000,
+        'yellow',
+        5000,
+        'red'
+        ]
+      
       }   
   });
 
@@ -103,7 +157,7 @@ map.on('load', () => {
   //   }
   // });
 });
-
+const countyLegendEl = document.getElementById('road-legend')
 map.addControl(new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl

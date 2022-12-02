@@ -29,6 +29,10 @@
             font-family: 'Helvetica','sans-serif';
             letter-spacing: 2px;
           }
+        h2 {font-size: 2.5vw;
+            font-family: 'Helvetica','sans-serif';
+            letter-spacing: 2px;
+          }
         p {font-size: 1.5vw;
             line-height: 150%;}
         .legend {
@@ -56,6 +60,15 @@
             margin-right: 5px;
             width: 10px;
             }
+
+        .watermark {
+          bottom: 15px;
+          left: 9.5px;
+          position: absolute;
+          z-index: : 1;
+          color:white 
+
+        }
     </style>
 </head>
 <body>
@@ -63,6 +76,7 @@
 
 
 <div id='map'></div>
+<div id="author" class="watermark"><h2> © Rinaldi & Azad @ NYU Tandon City Lab</h2> </div>
 <div id="road-legend" class="legend">
   <h4>Traffic Volume</h4>
   <div><span style="background-color: red"></span>5000</div>
@@ -71,7 +85,6 @@
   <div><span style="background-color: lime"></span>1000</div>
   <div><span style="background-color: cyan"></span>500</div>
   <div><span style="background-color: royalblue"></span>100</div>
-
 </div>
 
 <script>

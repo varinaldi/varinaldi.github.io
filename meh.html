@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Hello Worldz</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <script src='https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.css' rel='stylesheet' />
+        <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+        <style>
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                }
+            body {
+                font-family: 'Open Sans';
+                background-color: rgba(0, 0, 0, 0.5);
+                border-radius: 10px; 
+                padding: 20px;
+                margin: 0px;
+                overflow: hidden;
+                /* text-shadow: 2px 2px 4px #000000; */
+            }
+
+            #info {
+                color: #fff;
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                /* text-align: center; */
+                z-index: 100;
+                display:block;
+
+            }
+            #title {
+              position: absolute;
+              background-color: rgba(14, 14, 14, 0.4);
+              border-radius: 10px; 
+              padding: 20px;
+              /* top: 15%; */
+              /* left: 10%; */
+              /* right:10%; */
+              width: 80vw;
+              margin: 10px;
+        
+              color: white;
+              font-size: 2vmin;
+              line-height: 2.5vmin;
+              box-shadow: 2px 2px 4px #000000;
+
+            }
+            h1 {
+              color: white;
+              font-size: 10vmin;
+              line-height: 8vmin;
+              font-family: 'Manrope';
+              /* font-style:italic; */
+              padding-left:30px;
+            }
+
+            p {
+              color: white;
+              font-size: 2vmin;
+              line-height: 3vmin;
+              font-family: 'Open Sans';
+              padding:30px;
+
+            }
+
+            a {}
+            .button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+            a:link {
+              color: #a8a8a8;
+            }
+
+            /* visited link */
+            a:visited {
+              color: #c4c4c4;
+            }
+
+        </style>
+    </head>
+    <body>
+      
+        <!-- <div id='map' style='width: 100%; height: 100%;'></div>
+
+        <script>
+           mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YWxkaSIsImEiOiJjaXNnMzI4YWgwMXFsMnludjJ4bjJ4eThnIn0.-bcvQ-o7nhM4q7qAll0sZA';
+           var map = new mapboxgl.Map({
+             container: 'map',
+             style: 'mapbox://styles/vivaldi/ckmuuhlbi5cdw17njhkudcrfc',
+             center: [-73.983, 40.693],
+             zoom: 16,
+             pitch: 60,
+             bearing: -45,
+
+            
+             antialias: true
+           });
+           map.on('load', function () {
+            map.flyTo({
+                center: [-73.893, 40.593],
+                zoom: 9,
+                bearing: 0,
+                pitch: 30,
+                speed: 2.8,
+                curve: 1,
+                easing: function (t) {
+                return t;
+                }
+            });
+           });
+           </script> -->
+           
+      <div id="title">
+          <h1>Vivaldi Rinaldi</h1>
+
+          <p> I have a background is GIS and am interested in the appplication of remote sensing and 3D modeling for urban morphology.
+            <br>
+            <br>
+             PSU Geography 2017 and NYU CUSP 2019 grad.
+            <br>
+            <br>
+            Currently doing PhD in Urban System at NYU Tandon Civil and Urban Engineering.
+
+            <br><br>
+            <a href="https://varinaldi.notion.site/Vivaldi-Rinaldi-c7c477423eb84a21b8a67adc28de8456"><b>Resume</b></a>
+
+            <br><br>
+            <b>Works:</b>
+            <br>
+            <a href="https://varinaldi.shinyapps.io/triadGeo/">Thick Mapping Puerto Rico</a>
+            <br>
+            <a href="https://docs.google.com/presentation/d/11WEFtS2I00c6UT8uxT4PjdcFeUcmW0s1UKJNDKyxtO4/edit?usp=sharing">Texture Mapping 2D Thermal Image onto 3D LiDAR Point Cloud</a>
+            <br>
+            <a href="https://varinaldi.github.io/Capstone/">NYU CUSP Capstone Final NYC Flood Map</a>
+            <br>
+            <a href="esriworks.pdf">Works at Esri Indonesia</a>
+            <br>
+            <!-- <a href="https://varinaldi.github.io/Coronavirus/">Coronavirus Outbreak</a> -->
+            <!-- <br> -->
+            <a href="https://varinaldi.github.io/Flood2020/">   Jakarta Flood 2020</a>
+            <br>
+            <!-- <a href="https://kartografi.github.io/gempa/">Simple Earthquake Mapping</a> -->
+            <!-- <br> -->
+            <a href="https://varinaldi.shinyapps.io/Borjistonk/">   Stock Movement Tracker using R Shiny</a>
+            <br>
+          </p>
+         </div>
+
+        
+         
+    </body>
+</html>

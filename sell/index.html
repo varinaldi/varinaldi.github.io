@@ -24,6 +24,7 @@
             font-size: 16px;
             color: red;
             font-style: italic;
+            text-align: center;
         }
     </style>
 </head>
@@ -33,6 +34,19 @@
 
     <script>
         let firstClick = true;
+        const annoyingTexts = [
+            "oh you have an addiction",
+            "udah lah, stop clicking",
+            "seriously? lagi??",
+            "gak cape??",
+            "bruh stop.",
+            "lu pikir ini togel?",
+            "your patience = 0",
+            "click click click, trus kenapa?",
+            "astaga, move on bro",
+            "makin diklik makin bingung kan?"
+        ];
+
         document.getElementById("sellButton").addEventListener("click", function() {
             if (firstClick) {
                 this.innerText = "YES!";
@@ -40,8 +54,9 @@
                 firstClick = false;
             } else {
                 let decision = Math.random() < 0.5 ? "YES" : "NO";
+                let randomAnnoyingText = annoyingTexts[Math.floor(Math.random() * annoyingTexts.length)];
                 this.innerText = decision;
-                document.getElementById("warningText").innerText = "*MEOWOO";
+                document.getElementById("warningText").innerText = randomAnnoyingText;
             }
         });
     </script>

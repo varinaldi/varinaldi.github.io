@@ -7,6 +7,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -17,10 +18,32 @@
             font-size: 20px;
             padding: 10px 20px;
             cursor: pointer;
+            margin: 10px;
+        }
+        p {
+            font-size: 16px;
+            color: red;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <button onclick="this.innerText='YES!'">SHOULD I SELL??</button>
+    <button id="sellButton">SHOULD I SELL??</button>
+    <p id="warningText"></p>
+
+    <script>
+        let firstClick = true;
+        document.getElementById("sellButton").addEventListener("click", function() {
+            if (firstClick) {
+                this.innerText = "YES!";
+                document.getElementById("warningText").innerText = "*don't click again or it will panas panas you";
+                firstClick = false;
+            } else {
+                let decision = Math.random() < 0.5 ? "YES" : "NO";
+                this.innerText = decision;
+                document.getElementById("warningText").innerText = "*MEOWOO";
+            }
+        });
+    </script>
 </body>
 </html>
